@@ -15,6 +15,7 @@ import { LoaderCircle } from "lucide-react"
 import { useAction } from "next-safe-action/hooks"
 // import Link from "next/link"
 import { useForm } from "react-hook-form"
+import { start } from "repl"
 
 type Props = {
     baseline?: GetBaseline
@@ -45,6 +46,7 @@ export function BaselineForm({
     ]
 
     const years = [
+        { id: 2023, description: "2023" },
         { id: 2024, description: "2024" },
         { id: 2025, description: "2025" },
         { id: 2026, description: "2026" },
@@ -54,14 +56,22 @@ export function BaselineForm({
         { id: 2030, description: "2030" },
     ]
 
+    const startDate = baseline
+        ? new Date(
+              +baseline.start_date.substring(0, 4),
+              +baseline.start_date.substring(5, 7) - 1,
+              +baseline.start_date.substring(8, 10),
+          )
+        : new Date()
+
     const defaultValues: SaveBaselineType = {
         baseline_id: baseline?.baseline_id ?? "(New)",
         code: baseline?.code ?? "",
         review: baseline?.review ?? 1,
         title: baseline?.title ?? "",
         description: baseline?.description ?? "",
-        start_month: baseline?.start_date.getMonth() ?? 0,
-        start_year: baseline?.start_date.getFullYear() ?? 0,
+        start_month: baseline ? startDate.getMonth() + 1 : 0,
+        start_year: baseline ? startDate.getFullYear() : 0,
         duration: baseline?.duration ?? 0,
         manager_id: baseline?.manager_id ?? "",
         estimator_id: baseline?.estimator_id ?? "",
@@ -156,15 +166,15 @@ export function BaselineForm({
 
                     <div className="flex w-full max-w-xs flex-col gap-4">
                         <ComboboxWithLabel<SaveBaselineType>
-                            fieldTitle="Start Month"
-                            nameInSchema="start_month"
-                            data={months ?? []}
-                        />
-
-                        <ComboboxWithLabel<SaveBaselineType>
                             fieldTitle="Start Year"
                             nameInSchema="start_year"
                             data={years ?? []}
+                        />
+
+                        <ComboboxWithLabel<SaveBaselineType>
+                            fieldTitle="Start Month"
+                            nameInSchema="start_month"
+                            data={months ?? []}
                         />
 
                         <InputWithLabel<SaveBaselineType>

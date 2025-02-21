@@ -42,8 +42,6 @@ import {
     ArrowDown,
     ArrowUp,
     ArrowUpDown,
-    CircleCheckIcon,
-    CircleXIcon,
     ClapperboardIcon,
     Edit,
     MoreHorizontal,
@@ -143,6 +141,7 @@ export function BaselineTable({ data }: Props) {
 
     const columnHeadersArray: Array<keyof GetBaseline> = [
         "code",
+        "review",
         "title",
         "manager",
         "estimator",
@@ -158,6 +157,7 @@ export function BaselineTable({ data }: Props) {
         }
     }> = {
         code: { label: "Code", width: 255, filterable: true },
+        review: { label: "Rev", width: 1, filterable: false },
         title: { label: "Title", width: 255, filterable: true },
         manager: { label: "Manager", width: 1, filterable: true },
         estimator: { label: "System Architect", width: 1, filterable: true },
@@ -180,7 +180,7 @@ export function BaselineTable({ data }: Props) {
                     <DropdownMenuGroup>
                         <DropdownMenuItem asChild>
                             <Link
-                                href={`/Baselines/form?BaselineId=${row.original.baseline_id}`}
+                                href={`/baselines/form?baselineId=${row.original.baseline_id}`}
                                 className="flex w-full"
                                 prefetch={false}
                             >
@@ -302,15 +302,16 @@ export function BaselineTable({ data }: Props) {
                                     <ArrowDown className="ml-2 h-4 w-4" />
                                 )}
 
-                                {column.getIsSorted() !== "desc" &&
+                                {/* {column.getIsSorted() !== "desc" &&
                                     column.getIsSorted() !== "asc" && (
                                         <ArrowUpDown className="ml-2 h-4 w-4" />
-                                    )}
+                                    )} */}
                             </Button>
                         )
                     },
                     cell: (info) => {
                         // presentational
+
                         // if (columnName === "isRevised") {
                         //     return (
                         //         <div className="grid place-content-center">
@@ -323,12 +324,25 @@ export function BaselineTable({ data }: Props) {
                         //     )
                         // }
 
+                        const formatStringValue = () => {
+                            const value = info.getValue()
+                            if (
+                                columnName === "description" &&
+                                typeof value === "string"
+                            ) {
+                                return value.length > 80
+                                    ? `${value.substring(0, 80)}...`
+                                    : value
+                            }
+                            return value?.toString()
+                        }
+
                         return (
                             <Link
-                                href={`/Baselines/form?BaselineId=${info.row.original.baseline_id}`}
+                                href={`/baselines/form?baselineId=${info.row.original.baseline_id}`}
                                 prefetch={false}
                             >
-                                <div>{info.renderValue()?.toString()}</div>
+                                <div>{formatStringValue()}</div>
                             </Link>
                         )
                     },

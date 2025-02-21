@@ -2,7 +2,7 @@
 
 import { actionClient } from "@/lib/safe-action"
 import { flattenValidationErrors } from "next-safe-action"
-import { revalidatePath } from "next/cache"
+import { cookies } from "next/headers"
 import { z } from "zod"
 
 const deleteBaselineSchema = z.object({
@@ -23,19 +23,27 @@ export const deleteBaselineAction = actionClient
         }: {
             parsedInput: deleteBaselineSchemaType
         }) => {
-            // const uc = new DeleteBaselineUseCase()
-            // const result = await uc.execute({
-            //     BaselineId: params.BaselineId,
-            // })
+            const baselineId = params.baselineId
+            console.log(baselineId)
 
-            const result = {
-                BaselineId: params.baselineId,
+            const response = await fetch(
+                `${process.env.NEXT_API_URL}/baselines/${baselineId}`,
+                {
+                    method: "DELETE",
+                },
+            )
+
+            if (!response.ok) {
+                const error = await response.json()
+                throw new Error(error.message)
             }
 
-            revalidatePath(`/Baselines/`)
+            // force client to refresh the page
+            const c = await cookies()
+            c.set("force-refresh", JSON.stringify(Math.random()))
 
             return {
-                message: `Baseline ID #${result.BaselineId} deleted successfully.`,
+                message: `Baseline ID #${baselineId} deleted successfully.`,
             }
         },
     )

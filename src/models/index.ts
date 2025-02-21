@@ -13,7 +13,7 @@ export type GetBaseline = {
     manager: string
     estimator_id: string
     estimator: string
-    start_date: Date
+    start_date: string
     created_at: Date
     updated_at: Date | null
 }

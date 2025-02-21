@@ -1,7 +1,10 @@
 import { z } from "zod"
 
 const saveBaselineSchema = z.object({
-    baseline_id: z.string().uuid("invalid Baseline Id"),
+    baseline_id: z.union([
+        z.string().uuid("invalid Baseline Id"),
+        z.literal("(New)"),
+    ]),
     code: z.string().min(1, "Code is required"),
     review: z
         .union([z.string(), z.number()])
@@ -35,8 +38,6 @@ const saveBaselineSchema = z.object({
             }
             return value
         }),
-    // .min(1, "Review is required")
-    // .max(99, "Review must be between 1 and 99"),
     title: z.string().min(1, "Title is required"),
     description: z.string().min(1, "Description is required"),
     start_month: z
@@ -87,7 +88,7 @@ const saveBaselineSchema = z.object({
                     year = value
                 }
 
-                if (year < 2024 || year > 2030) {
+                if (year < 2023 || year > 2030) {
                     return false
                 }
 
