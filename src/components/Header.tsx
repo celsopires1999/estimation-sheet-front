@@ -32,12 +32,12 @@ export function Header() {
                 <div className="flex items-center">
                     <NavButtonMenu
                         icon={HandshakeIcon}
-                        label="Agreements"
+                        label="Baselines"
                         choices={[
-                            { title: "Search Agreements", href: "/agreements" },
+                            { title: "Search Baselines", href: "/baselines" },
                             {
-                                title: "New Agreement",
-                                href: "/agreements/form",
+                                title: "New Baseline",
+                                href: "/baselines/form",
                             },
                         ]}
                     />

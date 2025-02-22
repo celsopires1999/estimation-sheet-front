@@ -6,15 +6,16 @@ import { cookies } from "next/headers"
 import { z } from "zod"
 import { ValidationError, ValidationErrorCodes } from "./validation.error"
 
-const deleteBaselineSchema = z.object({
-    baselineId: z.string().uuid("invalid UUID"),
+const deleteCostSchema = z.object({
+    costId: z.string().uuid("invalid cost ID"),
+    baselineId: z.string().uuid("invalid baseline ID"),
 })
 
-export type deleteBaselineSchemaType = typeof deleteBaselineSchema._type
+export type deleteCostSchemaType = typeof deleteCostSchema._type
 
-export const deleteBaselineAction = actionClient
-    .metadata({ actionName: "deleteBaselineAction" })
-    .schema(deleteBaselineSchema, {
+export const deleteCostAction = actionClient
+    .metadata({ actionName: "deleteCostAction" })
+    .schema(deleteCostSchema, {
         handleValidationErrorsShape: async (ve) =>
             flattenValidationErrors(ve).fieldErrors,
     })
@@ -22,11 +23,12 @@ export const deleteBaselineAction = actionClient
         async ({
             parsedInput: params,
         }: {
-            parsedInput: deleteBaselineSchemaType
+            parsedInput: deleteCostSchemaType
         }) => {
-            const baselineId = params.baselineId
+            const { costId, baselineId } = params
+
             const response = await fetch(
-                `${process.env.NEXT_API_URL}/baselines/${baselineId}`,
+                `${process.env.NEXT_API_URL}/baselines/${baselineId}/costs/${costId}`,
                 {
                     method: "DELETE",
                 },
@@ -48,7 +50,7 @@ export const deleteBaselineAction = actionClient
             c.set("force-refresh", JSON.stringify(Math.random()))
 
             return {
-                message: `Baseline ID #${baselineId} deleted successfully.`,
+                message: `Cost ID #${costId} deleted successfully.`,
             }
         },
     )

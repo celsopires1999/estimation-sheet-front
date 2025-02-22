@@ -1,9 +1,11 @@
 "use server"
 
 import { actionClient } from "@/lib/safe-action"
-import saveBaselineSchema, { SaveBaselineType } from "@/zod-schemas/baseline"
+import { CreateBaseline, UpdateBaseline } from "@/models"
+import { saveBaselineSchema, SaveBaselineType } from "@/zod-schemas/baseline"
 import { flattenValidationErrors } from "next-safe-action"
 import { cookies } from "next/headers"
+import { ValidationError, ValidationErrorCodes } from "./validation.error"
 
 export const saveBaselineAction = actionClient
     .metadata({ actionName: "saveBaselineAction" })
@@ -17,8 +19,6 @@ export const saveBaselineAction = actionClient
         }: {
             parsedInput: SaveBaselineType
         }) => {
-            console.log(baseline)
-
             if (baseline.baseline_id === "(New)") {
                 return await createBaseline(baseline)
             } else {
@@ -27,7 +27,19 @@ export const saveBaselineAction = actionClient
         },
     )
 
-async function createBaseline(baseline: SaveBaselineType) {
+async function createBaseline(input: SaveBaselineType) {
+    const baseline: CreateBaseline = {
+        code: input.code,
+        review: input.review,
+        title: input.title,
+        description: input.description,
+        duration: input.duration,
+        manager_id: input.manager_id,
+        estimator_id: input.estimator_id,
+        start_year: +input.start_year,
+        start_month: +input.start_month,
+    }
+
     const response = await fetch(`${process.env.NEXT_API_URL}/baselines`, {
         method: "POST",
         headers: {
@@ -36,12 +48,18 @@ async function createBaseline(baseline: SaveBaselineType) {
         body: JSON.stringify(baseline),
     })
 
-    const data = await response.json()
-
     if (!response.ok) {
-        const error = data
-        throw new Error(error.message)
+        const e = await response.json()
+
+        if (ValidationErrorCodes.includes(response.status)) {
+            throw new ValidationError(e.message)
+        }
+
+        console.error(e)
+        throw new Error(e.error)
     }
+
+    const data = await response.json()
 
     const { baseline_id }: { baseline_id: string } = data
 
@@ -55,9 +73,21 @@ async function createBaseline(baseline: SaveBaselineType) {
     }
 }
 
-async function updateBaseline(baseline: SaveBaselineType) {
+async function updateBaseline(input: SaveBaselineType) {
+    const baseline: UpdateBaseline = {
+        code: input.code,
+        review: input.review,
+        title: input.title,
+        description: input.description,
+        duration: input.duration,
+        manager_id: input.manager_id,
+        estimator_id: input.estimator_id,
+        start_year: +input.start_year,
+        start_month: +input.start_month,
+    }
+
     const response = await fetch(
-        `${process.env.NEXT_API_URL}/baselines/${baseline.baseline_id}`,
+        `${process.env.NEXT_API_URL}/baselines/${input.baseline_id}`,
         {
             method: "PATCH",
             headers: {
@@ -66,11 +96,17 @@ async function updateBaseline(baseline: SaveBaselineType) {
             body: JSON.stringify(baseline),
         },
     )
-
     if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.message)
+        const e = await response.json()
+
+        if (ValidationErrorCodes.includes(response.status)) {
+            throw new ValidationError(e.message)
+        }
+
+        console.error(e)
+        throw new Error(e.error)
     }
+
     const data = await response.json()
 
     const { baseline_id }: { baseline_id: string } = data

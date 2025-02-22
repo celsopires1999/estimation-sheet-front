@@ -1,3 +1,4 @@
+import { ValidationError } from "@/actions/validation.error"
 import { createSafeActionClient } from "next-safe-action"
 import { z } from "zod"
 
@@ -20,13 +21,13 @@ export const actionClient = createSafeActionClient({
         //     }
         // }
 
-        // if (e instanceof ValidationError) {
-        //     return e.message
-        // }
+        if (e instanceof ValidationError) {
+            return e.message
+        }
 
         const log = {
             time: new Date().toISOString(),
-            message: e.message,
+            message: e,
             actionName: metadata?.actionName,
             clientInput: clientInput,
         }
@@ -35,6 +36,6 @@ export const actionClient = createSafeActionClient({
         // if (e instanceof DatabaseError) {
         //     return "Database Error: Your data did not save. Support will be notified."
         // }
-        return e.message
+        return "Something went wrong. Support will be notified."
     },
 })

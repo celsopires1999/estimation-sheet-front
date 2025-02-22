@@ -57,3 +57,50 @@ export function toDecimal(value: string) {
         return new Decimal(0)
     }
 }
+
+export function isValidNumber(
+    input: string | number,
+    inferiorLimit: number,
+    superiorLimit: number,
+) {
+    let value: number
+
+    if (typeof input === "string") {
+        value = parseInt(input)
+
+        if (isNaN(value)) {
+            return false
+        }
+    } else {
+        value = input
+    }
+
+    if (value < inferiorLimit || value > superiorLimit) {
+        return false
+    }
+
+    return true
+}
+
+export function coarseInteger(value: string | number) {
+    if (typeof value === "string") {
+        return parseInt(value)
+    }
+    return value
+}
+
+export function formatDecimal(
+    value: number | string | unknown,
+    minimumFractionDigits = 2,
+    maximumFractionDigits = 2,
+) {
+    if (typeof value !== "string" && typeof value !== "number") {
+        return ""
+    }
+
+    return new Intl.NumberFormat("pt-BR", {
+        style: "decimal",
+        minimumFractionDigits,
+        maximumFractionDigits,
+    }).format(+value)
+}

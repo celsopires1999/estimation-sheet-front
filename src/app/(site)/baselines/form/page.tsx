@@ -3,6 +3,7 @@ import { getBaseline } from "@/lib/queries/baselines"
 import { BaselineForm } from "./BaselineForm"
 import { getUsers } from "@/lib/queries/users"
 import { ManagerOption, SolutionArchitectOption } from "@/models"
+import { MonthOptions, YearsOptions } from "@/data"
 
 export async function generateMetadata({
     searchParams,
@@ -60,6 +61,8 @@ export default async function BaselineFormPage({
                     baseline={baseline}
                     managers={managers}
                     solutionArchitects={solutionArchitects}
+                    years={YearsOptions}
+                    months={MonthOptions}
                 />
             )
         } else {
@@ -69,6 +72,8 @@ export default async function BaselineFormPage({
                     key="new"
                     managers={managers}
                     solutionArchitects={solutionArchitects}
+                    years={YearsOptions}
+                    months={MonthOptions}
                 />
             )
         }

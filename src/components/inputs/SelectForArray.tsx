@@ -4,7 +4,6 @@ import {
     FormControl,
     FormField,
     FormItem,
-    FormLabel,
     FormMessage,
 } from "@/components/ui/form"
 
@@ -24,37 +23,39 @@ type DataObj = {
 }
 
 type Props<Schema> = {
-    fieldTitle: string
+    // fieldTitle: string
     nameInSchema: keyof Schema & string
     data: DataObj[]
     className?: string
+    fieldArrayName?: string
 }
 
-export function SelectWithLabel<Schema>({
-    fieldTitle,
+export function SelectForArray<Schema>({
+    // fieldTitle,
     nameInSchema,
     data,
     className,
+    fieldArrayName,
 }: Props<Schema>) {
     const form = useFormContext()
 
     return (
         <FormField
             control={form.control}
-            name={nameInSchema}
+            name={fieldArrayName ?? nameInSchema}
             render={({ field }) => (
                 <FormItem>
-                    <FormLabel
+                    {/* <FormLabel
                         className="text-base font-semibold"
-                        htmlFor={nameInSchema}
+                        htmlFor={fieldArrayName ?? nameInSchema}
                     >
                         {fieldTitle}
-                    </FormLabel>
+                    </FormLabel> */}
 
                     <Select {...field} onValueChange={field.onChange}>
                         <FormControl>
                             <SelectTrigger
-                                id={nameInSchema}
+                                id={fieldArrayName ?? nameInSchema}
                                 className={`w-full max-w-xs ${className}`}
                             >
                                 <SelectValue placeholder="Select" />
@@ -64,7 +65,7 @@ export function SelectWithLabel<Schema>({
                         <SelectContent>
                             {data.map((item) => (
                                 <SelectItem
-                                    key={`${nameInSchema}_${item.id}`}
+                                    key={`${fieldArrayName ?? nameInSchema}_${item.id}`}
                                     value={item.id}
                                 >
                                     {item.description}

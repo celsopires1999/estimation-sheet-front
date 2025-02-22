@@ -9,60 +9,29 @@ import { Button } from "@/components/ui/button"
 import { Form } from "@/components/ui/form"
 import { useToast } from "@/hooks/use-toast"
 import { GetBaseline, ManagerOption, SolutionArchitectOption } from "@/models"
-import saveBaselineSchema, { SaveBaselineType } from "@/zod-schemas/baseline"
+import { saveBaselineSchema, SaveBaselineType } from "@/zod-schemas/baseline"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { LoaderCircle } from "lucide-react"
+import { ChevronRight, LoaderCircle } from "lucide-react"
 import { useAction } from "next-safe-action/hooks"
-// import Link from "next/link"
+import Link from "next/link"
 import { useForm } from "react-hook-form"
-import { start } from "repl"
 
 type Props = {
     baseline?: GetBaseline
     managers: ManagerOption[]
     solutionArchitects: SolutionArchitectOption[]
+    months: { id: string; description: string }[]
+    years: { id: string; description: string }[]
 }
 
 export function BaselineForm({
     baseline,
     managers,
     solutionArchitects,
+    years,
+    months,
 }: Props) {
     const { toast } = useToast()
-
-    const months = [
-        { id: 1, description: "January" },
-        { id: 2, description: "February" },
-        { id: 3, description: "March" },
-        { id: 4, description: "April" },
-        { id: 5, description: "May" },
-        { id: 6, description: "June" },
-        { id: 7, description: "July" },
-        { id: 8, description: "August" },
-        { id: 9, description: "September" },
-        { id: 10, description: "October" },
-        { id: 11, description: "November" },
-        { id: 12, description: "December" },
-    ]
-
-    const years = [
-        { id: 2023, description: "2023" },
-        { id: 2024, description: "2024" },
-        { id: 2025, description: "2025" },
-        { id: 2026, description: "2026" },
-        { id: 2027, description: "2027" },
-        { id: 2028, description: "2028" },
-        { id: 2029, description: "2029" },
-        { id: 2030, description: "2030" },
-    ]
-
-    const startDate = baseline
-        ? new Date(
-              +baseline.start_date.substring(0, 4),
-              +baseline.start_date.substring(5, 7) - 1,
-              +baseline.start_date.substring(8, 10),
-          )
-        : new Date()
 
     const defaultValues: SaveBaselineType = {
         baseline_id: baseline?.baseline_id ?? "(New)",
@@ -70,8 +39,10 @@ export function BaselineForm({
         review: baseline?.review ?? 1,
         title: baseline?.title ?? "",
         description: baseline?.description ?? "",
-        start_month: baseline ? startDate.getMonth() + 1 : 0,
-        start_year: baseline ? startDate.getFullYear() : 0,
+        start_year: baseline ? baseline.start_date.substring(0, 4) : "0",
+        start_month: baseline
+            ? (+baseline.start_date.substring(5, 7)).toString()
+            : "0",
         duration: baseline?.duration ?? 0,
         manager_id: baseline?.manager_id ?? "",
         estimator_id: baseline?.estimator_id ?? "",
@@ -128,8 +99,33 @@ export function BaselineForm({
             <DisplayServerActionResponse result={saveResult} />
             <div className="flex items-center justify-between">
                 <h2 className="text-2xl font-bold">
-                    {baseline?.baseline_id ? "Edit" : "New"} Baseline Form
+                    {baseline?.baseline_id ? "Edit" : "New"} Baseline
                 </h2>
+                {baseline && (
+                    <div className="flex">
+                        <Button variant="ghost" asChild>
+                            <Link
+                                href={`/baselines/${baseline?.baseline_id}/costs`}
+                                className="flex w-full"
+                                prefetch={false}
+                            >
+                                <span>Costs</span>{" "}
+                                <ChevronRight className="h-4 w-4" />
+                            </Link>
+                        </Button>
+
+                        <Button variant="ghost" asChild>
+                            <Link
+                                href={`/baselines/${baseline?.baseline_id}/efforts`}
+                                className="flex w-full"
+                                prefetch={false}
+                            >
+                                <span>Efforts</span>{" "}
+                                <ChevronRight className="h-4 w-4" />
+                            </Link>
+                        </Button>
+                    </div>
+                )}
             </div>
 
             <Form {...form}>
@@ -137,46 +133,58 @@ export function BaselineForm({
                     onSubmit={form.handleSubmit(submitForm)}
                     className="flex flex-col gap-4 md:flex-row md:gap-8"
                 >
-                    <div className="flex w-full max-w-xs flex-col gap-4">
-                        <InputWithLabel<SaveBaselineType>
-                            fieldTitle="Code"
-                            nameInSchema="code"
-                        />
-
-                        <InputWithLabel<SaveBaselineType>
-                            fieldTitle="Review"
-                            nameInSchema="review"
-                            type="number"
-                            step={1}
-                            min={1}
-                            max={99}
-                        />
+                    <div className="flex w-full max-w-lg flex-col gap-4">
+                        <div className="flex items-center justify-between gap-4">
+                            <div className="w-2/3">
+                                <InputWithLabel<SaveBaselineType>
+                                    fieldTitle="Code"
+                                    nameInSchema="code"
+                                />
+                            </div>
+                            <div className="w-1/3">
+                                <InputWithLabel<SaveBaselineType>
+                                    fieldTitle="Review"
+                                    nameInSchema="review"
+                                    type="number"
+                                    step={1}
+                                    min={1}
+                                    max={99}
+                                />
+                            </div>
+                        </div>
 
                         <InputWithLabel<SaveBaselineType>
                             fieldTitle="Title"
                             nameInSchema="title"
+                            className="max-w-full"
                         />
 
                         <TextAreaWithLabel<SaveBaselineType>
                             fieldTitle="Description"
                             nameInSchema="description"
-                            className="h-40 max-w-2xl"
+                            className="h-40 max-w-full"
                         />
                     </div>
 
-                    <div className="flex w-full max-w-xs flex-col gap-4">
-                        <ComboboxWithLabel<SaveBaselineType>
-                            fieldTitle="Start Year"
-                            nameInSchema="start_year"
-                            data={years ?? []}
-                        />
-
-                        <ComboboxWithLabel<SaveBaselineType>
-                            fieldTitle="Start Month"
-                            nameInSchema="start_month"
-                            data={months ?? []}
-                        />
-
+                    <div className="flex w-full max-w-lg flex-col gap-4">
+                        <div className="flex items-center justify-between gap-4">
+                            <div className="w-1/2">
+                                <ComboboxWithLabel<SaveBaselineType>
+                                    fieldTitle="Start Year"
+                                    nameInSchema="start_year"
+                                    data={years ?? []}
+                                    className="max-w-full"
+                                />
+                            </div>
+                            <div className="w-1/2">
+                                <ComboboxWithLabel<SaveBaselineType>
+                                    fieldTitle="Start Month"
+                                    nameInSchema="start_month"
+                                    data={months ?? []}
+                                    className="max-w-full"
+                                />
+                            </div>
+                        </div>
                         <InputWithLabel<SaveBaselineType>
                             fieldTitle="Duration (months)"
                             nameInSchema="duration"
@@ -184,17 +192,20 @@ export function BaselineForm({
                             step={1}
                             min={1}
                             max={99}
+                            className="max-w-full"
                         />
                         <ComboboxWithLabel<SaveBaselineType>
                             fieldTitle="Manager"
                             nameInSchema="manager_id"
                             data={managers ?? []}
+                            className="max-w-full"
                         />
 
                         <ComboboxWithLabel<SaveBaselineType>
                             fieldTitle="Solution Architect"
                             nameInSchema="estimator_id"
                             data={solutionArchitects ?? []}
+                            className="max-w-full"
                         />
                         <div className="flex max-w-xs gap-2">
                             <Button
