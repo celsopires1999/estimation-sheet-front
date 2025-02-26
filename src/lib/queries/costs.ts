@@ -1,5 +1,6 @@
-import { GetCost, GetCostsBody } from "@/models"
 import "server-only"
+
+import { GetCost, GetCostsBody } from "@/models"
 
 export async function getCost(
     baselineID: string,

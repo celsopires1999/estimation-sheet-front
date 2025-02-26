@@ -10,7 +10,7 @@ type Props = {
     children?: React.ReactNode
 }
 
-export function CostHeader({ title, baseline, children }: Props) {
+export function EffortHeader({ title, baseline, children }: Props) {
     const month = baseline
         ? getMonthDescription(baseline?.start_date.substring(5, 7))
         : null
@@ -34,11 +34,11 @@ export function CostHeader({ title, baseline, children }: Props) {
 
                     <Button variant="ghost" asChild>
                         <Link
-                            href={`/baselines/${baseline?.baseline_id}/efforts`}
+                            href={`/baselines/${baseline?.baseline_id}/costs`}
                             className="flex w-full"
                             prefetch={false}
                         >
-                            <span>Efforts</span>{" "}
+                            <span>Costs</span>{" "}
                             <ChevronRight className="h-4 w-4" />
                         </Link>
                     </Button>

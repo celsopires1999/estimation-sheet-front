@@ -1,5 +1,5 @@
 "use client"
-import { deleteCostAction } from "@/actions/deleteCostAction"
+import { deleteBaselineAction } from "@/actions/deleteBaselineAction"
 import { AlertConfirmation } from "@/components/AlertConfirmation"
 import Deleting from "@/components/Deleting"
 import { Filter } from "@/components/react-table/Filter"
@@ -8,9 +8,12 @@ import { Button } from "@/components/ui/button"
 import {
     DropdownMenu,
     DropdownMenuContent,
-    DropdownMenuGroup,
     DropdownMenuItem,
     DropdownMenuLabel,
+    DropdownMenuPortal,
+    DropdownMenuSub,
+    DropdownMenuSubContent,
+    DropdownMenuSubTrigger,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Label } from "@/components/ui/label"
@@ -25,12 +28,7 @@ import {
 } from "@/components/ui/table"
 import { toast } from "@/hooks/use-toast"
 import { useTableStateHelper } from "@/hooks/useTableStateHelper"
-import {
-    GetBaseline,
-    GetCost,
-    getCostTypeDescription,
-    getTaxDescription,
-} from "@/models"
+import { GetBaseline } from "@/models"
 import {
     CellContext,
     createColumnHelper,
@@ -46,6 +44,8 @@ import {
     ArrowDown,
     ArrowUp,
     Edit,
+    FileIcon,
+    HandshakeIcon,
     MoreHorizontal,
     Plus,
     TableOfContents,
@@ -55,30 +55,20 @@ import { useAction } from "next-safe-action/hooks"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { JSX, useEffect, useState } from "react"
-import { CostHeader } from "./components/CostHeader"
-import { FormatDecimal } from "./components/FormatDecimal"
-import { Inflation } from "./components/Inflation"
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card"
+import { Description } from "./components/Description"
 
 type Props = {
-    baseline: GetBaseline
-    data: GetCost[]
+    data: GetBaseline[]
 }
 
-export function CostTable({ baseline, data }: Props) {
+export function BaselineTable({ data }: Props) {
     const router = useRouter()
 
     const searchParams = useSearchParams()
 
     const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false)
-    const [CostToDelete, setCostToDelete] = useState<GetCost | null>(null)
+    const [BaselineToDelete, setBaselineToDelete] =
+        useState<GetBaseline | null>(null)
 
     const [
         filterToggle,
@@ -94,8 +84,8 @@ export function CostTable({ baseline, data }: Props) {
         handleColumnFilters,
     ] = useTableStateHelper()
 
-    const handleDeleteCost = (cost: GetCost) => {
-        setCostToDelete(cost)
+    const handleDeleteBaseline = (baseline: GetBaseline) => {
+        setBaselineToDelete(baseline)
         setShowDeleteConfirmation(true)
     }
 
@@ -111,7 +101,7 @@ export function CostTable({ baseline, data }: Props) {
         executeAsync: executeDelete,
         isPending: isDeleting,
         reset: resetDeleteAction,
-    } = useAction(deleteCostAction, {
+    } = useAction(deleteBaselineAction, {
         onSuccess({ data }) {
             if (data?.message) {
                 toast({
@@ -131,12 +121,11 @@ export function CostTable({ baseline, data }: Props) {
     })
 
     const confirmDeleteBaseline = async () => {
-        if (CostToDelete) {
+        if (BaselineToDelete) {
             resetDeleteAction()
             try {
                 await executeDelete({
-                    costId: CostToDelete.cost_id,
-                    baselineId: CostToDelete.baseline_id,
+                    baselineId: BaselineToDelete.baseline_id,
                 })
             } catch (error) {
                 if (error instanceof Error) {
@@ -149,20 +138,20 @@ export function CostTable({ baseline, data }: Props) {
             }
         }
         setShowDeleteConfirmation(false)
-        setCostToDelete(null)
+        setBaselineToDelete(null)
     }
 
-    const columnHeadersArray: Array<keyof GetCost> = [
+    const columnHeadersArray: Array<keyof GetBaseline> = [
+        "code",
+        "review",
+        "title",
+        "manager",
+        "estimator",
         "description",
-        "cost_type",
-        "amount",
-        "currency",
-        "tax",
-        "apply_inflation",
     ]
 
     const columnDefs: Partial<{
-        [K in keyof GetCost]: {
+        [K in keyof GetBaseline]: {
             label: string
             width?: number
             filterable?: boolean
@@ -170,81 +159,141 @@ export function CostTable({ baseline, data }: Props) {
             presenter?: ({ value }: { value: unknown }) => JSX.Element
         }
     }> = {
-        description: { label: "Description", width: 255, filterable: true },
-        cost_type: {
-            label: "Cost Type",
-            width: 150,
-            filterable: true,
-            transform: getCostTypeDescription,
-        },
-        amount: {
-            label: "Amount",
-            width: 150,
-            filterable: false,
-            presenter: FormatDecimal,
-        },
-        currency: { label: "Currency", width: 1, filterable: true },
-        tax: {
-            label: "Tax",
-            width: 150,
-            filterable: true,
-            transform: getTaxDescription,
-        },
-        apply_inflation: {
-            label: "Inflation?",
+        code: { label: "Code", width: 150, filterable: true },
+        review: { label: "Rev", width: 1, filterable: false },
+        title: { label: "Title", width: 255, filterable: true },
+        manager: { label: "Manager", width: 1, filterable: true },
+        estimator: { label: "System Architect", width: 1, filterable: true },
+        description: {
+            label: "Description",
             width: 1,
             filterable: false,
-            presenter: Inflation,
+            presenter: Description,
         },
     }
 
-    const columnHelper = createColumnHelper<GetCost>()
+    const columnHelper = createColumnHelper<GetBaseline>()
 
-    const ActionsCell = ({ row }: CellContext<GetCost, unknown>) => {
-        return (
-            <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="h-8 w-8 p-0">
-                        <span className="sr-only">Open Menu</span>
-                        <MoreHorizontal className="h-4 w-4" />
-                    </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                    <DropdownMenuLabel>Options</DropdownMenuLabel>
-                    <DropdownMenuGroup>
-                        <DropdownMenuItem asChild>
-                            <Link
-                                href={`/baselines/${row.original.baseline_id}/costs/form`}
-                                className="flex w-full"
-                                prefetch={false}
+    const ActionsCell = ({ row }: CellContext<GetBaseline, unknown>) => (
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                    <span className="sr-only">Open Menu</span>
+                    <MoreHorizontal className="h-4 w-4" />
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Options</DropdownMenuLabel>
+
+                <DropdownMenuSub>
+                    <DropdownMenuSubTrigger>
+                        <HandshakeIcon className="mr-2 h-4 w-4" />
+                        <span>Baseline</span>
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuPortal>
+                        <DropdownMenuSubContent>
+                            <DropdownMenuItem asChild>
+                                <Link
+                                    href={`/baselines/form`}
+                                    className="flex w-full"
+                                    prefetch={false}
+                                >
+                                    <Plus className="mr-2 h-4 w-4" />
+                                    <span>Add</span>
+                                </Link>
+                            </DropdownMenuItem>
+
+                            <DropdownMenuItem asChild>
+                                <Link
+                                    href={`/baselines/form?baselineId=${row.original.baseline_id}`}
+                                    className="flex w-full"
+                                    prefetch={false}
+                                >
+                                    <Edit className="mr-2 h-4 w-4" />
+                                    <span>Edit</span>
+                                </Link>
+                            </DropdownMenuItem>
+
+                            <DropdownMenuItem
+                                onClick={() =>
+                                    handleDeleteBaseline(row.original)
+                                }
                             >
-                                <Plus className="mr-2 h-4 w-4" />
-                                <span>Add</span>
-                            </Link>
-                        </DropdownMenuItem>
+                                <Trash className="mr-2 h-4 w-4" />
+                                <span>Delete</span>
+                            </DropdownMenuItem>
+                        </DropdownMenuSubContent>
+                    </DropdownMenuPortal>
+                </DropdownMenuSub>
 
-                        <DropdownMenuItem asChild>
-                            <Link
-                                href={`/baselines/${row.original.baseline_id}/costs/form?costId=${row.original.cost_id}`}
-                                className="flex w-full"
-                                prefetch={false}
-                            >
-                                <Edit className="mr-2 h-4 w-4" />
-                                <span>Edit</span>
-                            </Link>
-                        </DropdownMenuItem>
+                <DropdownMenuSub>
+                    <DropdownMenuSubTrigger>
+                        <FileIcon className="mr-2 h-4 w-4" />
+                        <span>Cost</span>
+                    </DropdownMenuSubTrigger>
 
-                        <DropdownMenuItem
-                            onClick={() => handleDeleteCost(row.original)}
-                        >
-                            <Trash className="mr-2 h-4 w-4" />
-                            <span>Delete</span>
-                        </DropdownMenuItem>
-                    </DropdownMenuGroup>
-                </DropdownMenuContent>
-            </DropdownMenu>
-        )
-    }
+                    <DropdownMenuPortal>
+                        <DropdownMenuSubContent>
+                            <DropdownMenuItem asChild>
+                                <Link
+                                    href={`/baselines/${row.original.baseline_id}/costs/form`}
+                                    className="flex w-full"
+                                    prefetch={false}
+                                >
+                                    <Plus className="mr-2 h-4 w-4" />
+                                    <span>Add</span>
+                                </Link>
+                            </DropdownMenuItem>
+
+                            <DropdownMenuItem asChild>
+                                <Link
+                                    href={`/baselines/${row.original.baseline_id}/costs`}
+                                    className="flex w-full"
+                                    prefetch={false}
+                                >
+                                    <Edit className="mr-2 h-4 w-4" />
+                                    <span>List</span>
+                                </Link>
+                            </DropdownMenuItem>
+                        </DropdownMenuSubContent>
+                    </DropdownMenuPortal>
+                </DropdownMenuSub>
+
+                <DropdownMenuSub>
+                    <DropdownMenuSubTrigger>
+                        <FileIcon className="mr-2 h-4 w-4" />
+                        <span>Effort</span>
+                    </DropdownMenuSubTrigger>
+
+                    <DropdownMenuPortal>
+                        <DropdownMenuSubContent>
+                            <DropdownMenuItem asChild>
+                                <Link
+                                    href={`/baselines/${row.original.baseline_id}/efforts/form`}
+                                    className="flex w-full"
+                                    prefetch={false}
+                                >
+                                    <Plus className="mr-2 h-4 w-4" />
+                                    <span>Add</span>
+                                </Link>
+                            </DropdownMenuItem>
+
+                            <DropdownMenuItem asChild>
+                                <Link
+                                    href={`/baselines/${row.original.baseline_id}/efforts`}
+                                    className="flex w-full"
+                                    prefetch={false}
+                                >
+                                    <Edit className="mr-2 h-4 w-4" />
+                                    <span>List</span>
+                                </Link>
+                            </DropdownMenuItem>
+                        </DropdownMenuSubContent>
+                    </DropdownMenuPortal>
+                </DropdownMenuSub>
+            </DropdownMenuContent>
+        </DropdownMenu>
+    )
 
     ActionsCell.displayName = "ActionsCell"
 
@@ -265,7 +314,6 @@ export function CostTable({ baseline, data }: Props) {
                     if (transformFn) {
                         return transformFn(value)
                     }
-
                     return value
                 },
                 {
@@ -315,7 +363,7 @@ export function CostTable({ baseline, data }: Props) {
 
                         return (
                             <Link
-                                href={`/baselines/${info.row.original.baseline_id}/costs/form?costId=${info.row.original.cost_id}`}
+                                href={`/baselines/form?baselineId=${info.row.original.baseline_id}`}
                                 prefetch={false}
                             >
                                 {presenterFn ? (
@@ -368,8 +416,9 @@ export function CostTable({ baseline, data }: Props) {
     }, [table.getState().columnFilters]) // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
-        <div className="flex flex-col gap-1 sm:px-8">
-            <CostHeader title="Costs List" baseline={baseline}>
+        <div className="mt-6 flex flex-col gap-4">
+            <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold">Baselines List</h2>
                 <div className="flex items-center space-x-2">
                     <Switch
                         id="filterToggle"
@@ -380,22 +429,7 @@ export function CostTable({ baseline, data }: Props) {
                         Filter
                     </Label>
                 </div>
-            </CostHeader>
-
-            {data.length === 0 && (
-                <div>
-                    <Button variant="ghost" asChild>
-                        <Link
-                            href={`/baselines/${baseline.baseline_id}/costs/form`}
-                            prefetch={false}
-                        >
-                            <Plus className="h-4 w-4" />
-                            <span>Add First Cost</span>
-                        </Link>
-                    </Button>
-                </div>
-            )}
-
+            </div>
             <div className="overflow-hidden rounded-lg border border-border">
                 <Table className="border">
                     <TableHeader>
@@ -533,7 +567,7 @@ export function CostTable({ baseline, data }: Props) {
                 setOpen={setShowDeleteConfirmation}
                 confirmationAction={confirmDeleteBaseline}
                 title="Are you sure you want to delete this Baseline?"
-                message={`This action cannot be undone. This will permanently delete the Cost ${CostToDelete?.description}.`}
+                message={`This action cannot be undone. This will permanently delete the Baseline ${BaselineToDelete?.code}}.`}
             />
             {isDeleting && <Deleting />}
         </div>

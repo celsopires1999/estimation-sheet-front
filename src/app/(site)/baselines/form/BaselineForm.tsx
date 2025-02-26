@@ -94,6 +94,8 @@ export function BaselineForm({
         }
     }
 
+    let baselineId = baseline?.baseline_id ?? saveResult.data?.baseline_id
+
     return (
         <div className="flex flex-col gap-1 sm:px-8">
             <DisplayServerActionResponse result={saveResult} />
@@ -101,11 +103,11 @@ export function BaselineForm({
                 <h2 className="text-2xl font-bold">
                     {baseline?.baseline_id ? "Edit" : "New"} Baseline
                 </h2>
-                {baseline && (
+                {baselineId && (
                     <div className="flex">
                         <Button variant="ghost" asChild>
                             <Link
-                                href={`/baselines/${baseline?.baseline_id}/costs`}
+                                href={`/baselines/${baselineId}/costs`}
                                 className="flex w-full"
                                 prefetch={false}
                             >
@@ -116,7 +118,7 @@ export function BaselineForm({
 
                         <Button variant="ghost" asChild>
                             <Link
-                                href={`/baselines/${baseline?.baseline_id}/efforts`}
+                                href={`/baselines/${baselineId}/efforts`}
                                 className="flex w-full"
                                 prefetch={false}
                             >

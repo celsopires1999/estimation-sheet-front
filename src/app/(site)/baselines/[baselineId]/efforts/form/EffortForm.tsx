@@ -1,6 +1,5 @@
 "use client"
 
-import { saveCostAction } from "@/actions/saveCostAction"
 import { DisplayServerActionResponse } from "@/components/DisplayServerActionResponse"
 import { CheckboxWithLabel } from "@/components/inputs/CheckboxWithLabel"
 import { InputDecimalForArray } from "@/components/inputs/InputDecimalForArray"
@@ -22,73 +21,73 @@ import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
 import { toDecimal } from "@/lib/utils"
 import {
-    CostType,
+    CompetenceOption,
     CostTypeOptions,
-    Currency,
     CurrencyOptions,
     GetBaseline,
-    GetCost,
-    Tax,
+    GetEffort,
     TaxOptions,
 } from "@/models"
-import {
-    SaveCostAllocationType,
-    saveCostSchema,
-    SaveCostType,
-} from "@/zod-schemas/cost"
 import { zodResolver } from "@hookform/resolvers/zod"
 import Decimal from "decimal.js"
 import { LoaderCircle, Trash } from "lucide-react"
 import { useAction } from "next-safe-action/hooks"
 // import Link from "next/link"
-import { Control, useFieldArray, useForm, useWatch } from "react-hook-form"
-import { CostHeader } from "../components/CostHeader"
+import { saveEffortAction } from "@/actions/saveEffortAction"
 import { Switch } from "@/components/ui/switch"
 import { useState } from "react"
+import { Control, useFieldArray, useForm, useWatch } from "react-hook-form"
+import { EffortHeader } from "../components/EffortHeader"
+import {
+    SaveEffortAllocationType,
+    saveEffortSchema,
+    SaveEffortType,
+} from "@/zod-schemas/effort"
+import { ComboboxWithLabel } from "@/components/inputs/ComboboxWithLabel"
+import { InputForArray } from "@/components/inputs/InputForArray"
 
 type Props = {
     baseline: GetBaseline
-    cost?: GetCost
+    effort?: GetEffort
+    competences: CompetenceOption[]
     months: { id: string; description: string }[]
     years: { id: string; description: string }[]
 }
 
-export function CostForm({ baseline, cost, years, months }: Props) {
+export function EffortForm({
+    baseline,
+    effort,
+    competences,
+    years,
+    months,
+}: Props) {
     const { toast } = useToast()
     const [listAllocToggle, setlistAllocToggle] = useState(false)
 
-    const defaultValues: SaveCostType = {
-        cost_id: cost?.cost_id ?? "(New)",
-        baseline_id: cost?.baseline_id ?? baseline.baseline_id,
-        cost_type: cost?.cost_type
-            ? (cost.cost_type as CostType)
-            : CostType.OTC,
-        description: cost?.description ?? "",
-        comment: cost?.comment ?? "",
-        amount: cost?.amount?.toString() ?? "0.00",
-        currency: cost?.currency ? (cost.currency as Currency) : Currency.BRL,
-        tax: cost?.tax
-            ? (cost.tax.toString() as Tax)
-            : Tax["Not Applicable (0%)"],
-        apply_inflation: cost?.apply_inflation ?? false,
-        cost_allocations: cost?.cost_allocations
-            ? cost.cost_allocations.map((alloc) => ({
+    const defaultValues: SaveEffortType = {
+        effort_id: effort?.effort_id ?? "(New)",
+        baseline_id: effort?.baseline_id ?? baseline.baseline_id,
+        competence_id: effort?.competence_id ?? "",
+        comment: effort?.comment ?? "",
+        hours: effort?.hours?.toString() ?? "0",
+        effort_allocations: effort?.effort_allocations
+            ? effort.effort_allocations.map((alloc) => ({
                   year: alloc.year.toString(),
                   month: alloc.month.toString(),
-                  amount: alloc.amount.toString(),
+                  hours: alloc.hours.toString(),
               }))
             : [
                   {
                       year: baseline.start_date.substring(0, 4),
                       month: (+baseline.start_date.substring(5, 7)).toString(),
-                      amount: "0.00",
+                      hours: "0",
                   },
               ],
     }
 
-    const form = useForm<SaveCostType>({
+    const form = useForm<SaveEffortType>({
         mode: "onBlur",
-        resolver: zodResolver(saveCostSchema),
+        resolver: zodResolver(saveEffortSchema),
         defaultValues,
     })
 
@@ -98,7 +97,7 @@ export function CostForm({ baseline, cost, years, months }: Props) {
     } = form
 
     const { fields, append, replace, remove } = useFieldArray({
-        name: "cost_allocations",
+        name: "effort_allocations",
         control,
     })
 
@@ -107,7 +106,7 @@ export function CostForm({ baseline, cost, years, months }: Props) {
         result: saveResult,
         isPending: isSaving,
         reset: resetSaveAction,
-    } = useAction(saveCostAction, {
+    } = useAction(saveEffortAction, {
         onSuccess({ data }) {
             if (data?.message) {
                 toast({
@@ -127,7 +126,7 @@ export function CostForm({ baseline, cost, years, months }: Props) {
         },
     })
 
-    async function submitForm(data: SaveCostType) {
+    async function submitForm(data: SaveEffortType) {
         resetSaveAction()
         try {
             await executeSave(data)
@@ -149,7 +148,7 @@ export function CostForm({ baseline, cost, years, months }: Props) {
             append({
                 year: baseline.start_date.substring(0, 4),
                 month: (+baseline.start_date.substring(5, 7) - 1).toString(),
-                amount: "0.00",
+                hours: "0",
             })
             return
         }
@@ -161,44 +160,41 @@ export function CostForm({ baseline, cost, years, months }: Props) {
             append({
                 year: (lastYear + 1).toString(),
                 month: "1",
-                amount: "0.00",
+                hours: "0",
             })
         } else {
             append({
                 year: lastYear.toString(),
                 month: (lastMonth + 1).toString(),
-                amount: "0.00",
+                hours: "0",
             })
         }
     }
 
     const handleLinearAllocation = () => {
-        const amount = form.getValues().amount
+        const hours = +form.getValues().hours
         const duration = baseline.duration
 
         const startYear = +baseline.start_date.substring(0, 4)
         const startMonth = +baseline.start_date.substring(5, 7)
 
-        const monthlyAmount = new Decimal(amount).div(duration).toFixed(0)
+        const monthlyHours = Math.floor(hours / duration)
 
-        const lastMonth = new Decimal(amount)
-            .sub(new Decimal(monthlyAmount).mul(duration))
-            .add(new Decimal(monthlyAmount))
-            .toFixed(2)
+        const lastMonth = hours - monthlyHours * duration + monthlyHours
 
         let year = startYear
         let month = startMonth
 
-        const newCostAllocations: SaveCostAllocationType[] = []
+        const newEffortAllocations: SaveEffortAllocationType[] = []
 
         for (let i = 0; i < duration; i++) {
             const alloc = {
                 year: year.toString(),
                 month: month.toString(),
-                amount: i === duration - 1 ? lastMonth : monthlyAmount,
+                hours: i === duration - 1 ? lastMonth : monthlyHours,
             }
 
-            newCostAllocations.push(alloc)
+            newEffortAllocations.push(alloc)
 
             if (month === 12) {
                 year++
@@ -208,12 +204,12 @@ export function CostForm({ baseline, cost, years, months }: Props) {
             }
         }
 
-        replace(newCostAllocations)
-        form.trigger("cost_allocations")
+        replace(newEffortAllocations)
+        form.trigger("effort_allocations")
     }
 
     const handleSortAllocation = () => {
-        const newValues = [...form.getValues().cost_allocations]
+        const newValues = [...form.getValues().effort_allocations]
 
         const sorted = newValues.sort((a, b) => {
             if (a.year === b.year) {
@@ -228,47 +224,42 @@ export function CostForm({ baseline, cost, years, months }: Props) {
     const TotalAllocated = ({
         control,
     }: {
-        control: Control<SaveCostType>
+        control: Control<SaveEffortType>
     }) => {
-        const costAllocations = useWatch({
+        const effortAllocations = useWatch({
             control,
-            name: "cost_allocations",
+            name: "effort_allocations",
         })
 
-        const currency = useWatch({
+        const hours = useWatch({
             control,
-            name: "currency",
+            name: "hours",
         })
 
-        const amount = useWatch({
-            control,
-            name: "amount",
-        })
-
-        if (costAllocations.length === 0) {
+        if (effortAllocations.length === 0) {
             return null
         }
 
-        const total = costAllocations.reduce(
-            (acc, item) => new Decimal(acc).add(toDecimal(item.amount)),
-            new Decimal(0),
+        const total = effortAllocations.reduce(
+            (acc, item) => acc + +item.hours,
+            0,
         )
 
         const formattedValue = new Intl.NumberFormat("pt-BR", {
             style: "decimal",
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0,
         }).format(+total)
 
         let isAllocated = false
 
         try {
-            isAllocated = new Decimal(amount).eq(total)
+            isAllocated = +hours === total
         } catch (error) /* eslint-disable-line  @typescript-eslint/no-unused-vars */ {}
 
         return (
             <span className={!isAllocated ? "text-destructive" : ""}>
-                Allocated: {formattedValue} {currency}
+                Allocated: {formattedValue} hours
             </span>
         )
     }
@@ -276,8 +267,8 @@ export function CostForm({ baseline, cost, years, months }: Props) {
     return (
         <div className="flex flex-col gap-1 sm:px-8">
             <DisplayServerActionResponse result={saveResult} />
-            <CostHeader
-                title={`${cost?.cost_id ? "Edit" : "New"} Cost`}
+            <EffortHeader
+                title={`${effort?.effort_id ? "Edit" : "New"} Effort`}
                 baseline={baseline}
             />
 
@@ -287,55 +278,24 @@ export function CostForm({ baseline, cost, years, months }: Props) {
                     className="flex flex-col gap-4 md:flex-row md:gap-8"
                 >
                     <div className="flex w-full max-w-lg flex-col gap-4">
-                        <InputWithLabel<SaveCostType>
-                            fieldTitle="Description"
-                            nameInSchema="description"
+                        <ComboboxWithLabel<SaveEffortType>
+                            fieldTitle="Competence"
+                            nameInSchema="competence_id"
+                            data={competences ?? []}
                             className="max-w-full"
                         />
 
-                        <div className="flex items-start justify-start gap-4">
-                            <div className="w-1/5">
-                                <SelectWithLabel<SaveCostType>
-                                    fieldTitle="Cost Type"
-                                    nameInSchema="cost_type"
-                                    data={CostTypeOptions}
-                                    className="max-w-full"
-                                />
-                            </div>
-
-                            <div className="w-3/5">
-                                <InputDecimalWithLabel<SaveCostType>
-                                    fieldTitle="Amount"
-                                    nameInSchema="amount"
-                                    type="number"
-                                    step="0.01"
-                                    className="max-w-full"
-                                />
-                            </div>
-                            <div className="w-1/5">
-                                <SelectWithLabel<SaveCostType>
-                                    fieldTitle="Currency"
-                                    nameInSchema="currency"
-                                    data={CurrencyOptions}
-                                    className="max-w-full"
-                                />
-                            </div>
-                        </div>
-
-                        <SelectWithLabel<SaveCostType>
-                            fieldTitle="Importing Tax"
-                            nameInSchema="tax"
-                            data={TaxOptions}
+                        <InputWithLabel<SaveEffortType>
+                            fieldTitle="Hours"
+                            nameInSchema="hours"
+                            type="number"
+                            step={1}
+                            min={1}
+                            max={999_999}
                             className="max-w-full"
                         />
 
-                        <CheckboxWithLabel<SaveCostType>
-                            fieldTitle="Inflation?"
-                            nameInSchema="apply_inflation"
-                            message="Yes"
-                            className="max-w-xs"
-                        />
-                        <TextAreaWithLabel<SaveCostType>
+                        <TextAreaWithLabel<SaveEffortType>
                             fieldTitle="Comment"
                             nameInSchema="comment"
                             className="h-40 max-w-full"
@@ -346,7 +306,7 @@ export function CostForm({ baseline, cost, years, months }: Props) {
                         <div className="space-y-2">
                             <div className="flex items-center justify-between">
                                 <Label className="text-base font-semibold">
-                                    Cost Allocations
+                                    Effort Allocations
                                 </Label>
                                 <div className="flex items-center space-x-2">
                                     <Switch
@@ -388,7 +348,7 @@ export function CostForm({ baseline, cost, years, months }: Props) {
                                                 </div>
                                                 <div className="w-4/12">
                                                     <Label className="text-base font-semibold">
-                                                        Amount
+                                                        Hours
                                                     </Label>
                                                 </div>
                                                 <div className="w-1/12"></div>
@@ -400,32 +360,34 @@ export function CostForm({ baseline, cost, years, months }: Props) {
                                                         className="flex items-start justify-start gap-4"
                                                     >
                                                         <div className="w-3/12">
-                                                            <SelectForArray<SaveCostAllocationType>
+                                                            <SelectForArray<SaveEffortAllocationType>
                                                                 nameInSchema="year"
                                                                 data={
                                                                     years ?? []
                                                                 }
                                                                 className="max-w-full"
-                                                                fieldArrayName={`cost_allocations.${index}.year`}
+                                                                fieldArrayName={`effort_allocations.${index}.year`}
                                                             />
                                                         </div>
                                                         <div className="w-4/12">
-                                                            <SelectForArray<SaveCostAllocationType>
+                                                            <SelectForArray<SaveEffortAllocationType>
                                                                 nameInSchema="month"
                                                                 data={
                                                                     months ?? []
                                                                 }
                                                                 className="max-w-full"
-                                                                fieldArrayName={`cost_allocations.${index}.month`}
+                                                                fieldArrayName={`effort_allocations.${index}.month`}
                                                             />
                                                         </div>
                                                         <div className="w-4/12">
-                                                            <InputDecimalForArray<SaveCostAllocationType>
-                                                                nameInSchema="amount"
+                                                            <InputForArray<SaveEffortAllocationType>
+                                                                nameInSchema="hours"
                                                                 type="number"
-                                                                step="0.01"
+                                                                step={1}
+                                                                min={1}
+                                                                max={99_999}
                                                                 className="max-w-full"
-                                                                fieldArrayName={`cost_allocations.${index}.amount`}
+                                                                fieldArrayName={`effort_allocations.${index}.hours`}
                                                             />
                                                         </div>
 
@@ -487,7 +449,8 @@ export function CostForm({ baseline, cost, years, months }: Props) {
                                                 </div>
                                                 <p className="mt-4 text-sm text-destructive">
                                                     {
-                                                        errors.cost_allocations
+                                                        errors
+                                                            .effort_allocations
                                                             ?.root?.message
                                                     }
                                                 </p>

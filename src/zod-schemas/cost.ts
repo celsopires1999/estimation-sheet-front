@@ -36,10 +36,7 @@ export const saveCostAllocationSchema = z.object({
 })
 
 export const saveCostSchema = z.object({
-    cost_id: z.union([
-        z.string().uuid("invalid Baseline Id"),
-        z.literal("(New)"),
-    ]),
+    cost_id: z.union([z.string().uuid("invalid Cost Id"), z.literal("(New)")]),
     baseline_id: z.string().uuid("invalid Baseline Id"),
     cost_type: z.nativeEnum(CostType, {
         errorMap: () => ({ message: "Invalid cost type" }),

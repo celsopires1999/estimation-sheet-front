@@ -1,8 +1,10 @@
 import { BackButton } from "@/components/BackButton"
 import { MonthOptions, YearsOptions } from "@/data"
 import { getBaseline } from "@/lib/queries/baselines"
-import { getCost } from "@/lib/queries/costs"
-import { CostForm } from "./CostForm"
+import { getEffort } from "@/lib/queries/efforts"
+import { EffortForm } from "./EffortForm"
+import { getCompetences } from "@/lib/queries/competences"
+import { CompetenceOption } from "@/models"
 
 export async function generateMetadata({
     params,
@@ -12,7 +14,7 @@ export async function generateMetadata({
     searchParams: Promise<{ [key: string]: string | undefined }>
 }) {
     const { baselineId } = await params
-    const { costId } = await searchParams
+    const { effortId } = await searchParams
 
     if (!baselineId) {
         return {
@@ -20,18 +22,18 @@ export async function generateMetadata({
         }
     }
 
-    if (costId) {
+    if (effortId) {
         return {
-            title: `Edit Cost #${costId} for Baseline #${baselineId}`,
+            title: `Edit Effort #${effortId} for Baseline #${baselineId}`,
         }
     }
 
     return {
-        title: `New Cost for Baseline #${baselineId}`,
+        title: `New Effort for Baseline #${baselineId}`,
     }
 }
 
-export default async function CostFormPage({
+export default async function EffortFormPage({
     params,
     searchParams,
 }: {
@@ -40,7 +42,7 @@ export default async function CostFormPage({
 }) {
     try {
         const { baselineId } = await params
-        const { costId } = await searchParams
+        const { effortId } = await searchParams
 
         if (!baselineId) {
             return (
@@ -66,22 +68,33 @@ export default async function CostFormPage({
             )
         }
 
-        if (costId) {
-            const cost = await getCost(baselineId, costId)
+        const competencesResult = await getCompetences()
+
+        const competences: CompetenceOption[] = competencesResult.map(
+            ({ competence_id, code }) => ({
+                id: competence_id,
+                description: code,
+            }),
+        )
+
+        if (effortId) {
+            const effort = await getEffort(baselineId, effortId)
             return (
-                <CostForm
-                    key={costId}
+                <EffortForm
+                    key={effortId}
                     baseline={baseline}
-                    cost={cost}
+                    effort={effort}
+                    competences={competences}
                     years={YearsOptions}
                     months={MonthOptions}
                 />
             )
         } else {
             return (
-                <CostForm
+                <EffortForm
                     key="new"
                     baseline={baseline}
+                    competences={competences}
                     years={YearsOptions}
                     months={MonthOptions}
                 />

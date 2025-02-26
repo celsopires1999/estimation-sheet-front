@@ -1,5 +1,5 @@
 "use client"
-import { deleteBaselineAction } from "@/actions/deleteBaselineAction"
+import { deleteEffortAction } from "@/actions/deleteEffortAction"
 import { AlertConfirmation } from "@/components/AlertConfirmation"
 import Deleting from "@/components/Deleting"
 import { Filter } from "@/components/react-table/Filter"
@@ -8,12 +8,9 @@ import { Button } from "@/components/ui/button"
 import {
     DropdownMenu,
     DropdownMenuContent,
+    DropdownMenuGroup,
     DropdownMenuItem,
     DropdownMenuLabel,
-    DropdownMenuPortal,
-    DropdownMenuSub,
-    DropdownMenuSubContent,
-    DropdownMenuSubTrigger,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Label } from "@/components/ui/label"
@@ -28,7 +25,7 @@ import {
 } from "@/components/ui/table"
 import { toast } from "@/hooks/use-toast"
 import { useTableStateHelper } from "@/hooks/useTableStateHelper"
-import { GetBaseline } from "@/models"
+import { GetBaseline, GetEffort } from "@/models"
 import {
     CellContext,
     createColumnHelper,
@@ -44,8 +41,6 @@ import {
     ArrowDown,
     ArrowUp,
     Edit,
-    FileIcon,
-    HandshakeIcon,
     MoreHorizontal,
     Plus,
     TableOfContents,
@@ -54,20 +49,22 @@ import {
 import { useAction } from "next-safe-action/hooks"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
-import { useEffect, useState } from "react"
+import { JSX, useEffect, useState } from "react"
+import { EffortHeader } from "./components/EffortHeader"
+import { Hours } from "./components/Hours"
 
 type Props = {
-    data: GetBaseline[]
+    baseline: GetBaseline
+    data: GetEffort[]
 }
 
-export function BaselineTable({ data }: Props) {
+export function EffortTable({ baseline, data }: Props) {
     const router = useRouter()
 
     const searchParams = useSearchParams()
 
     const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false)
-    const [BaselineToDelete, setBaselineToDelete] =
-        useState<GetBaseline | null>(null)
+    const [EffortToDelete, setEffortToDelete] = useState<GetEffort | null>(null)
 
     const [
         filterToggle,
@@ -83,8 +80,8 @@ export function BaselineTable({ data }: Props) {
         handleColumnFilters,
     ] = useTableStateHelper()
 
-    const handleDeleteBaseline = (baseline: GetBaseline) => {
-        setBaselineToDelete(baseline)
+    const handleDeleteEffort = (effort: GetEffort) => {
+        setEffortToDelete(effort)
         setShowDeleteConfirmation(true)
     }
 
@@ -100,7 +97,7 @@ export function BaselineTable({ data }: Props) {
         executeAsync: executeDelete,
         isPending: isDeleting,
         reset: resetDeleteAction,
-    } = useAction(deleteBaselineAction, {
+    } = useAction(deleteEffortAction, {
         onSuccess({ data }) {
             if (data?.message) {
                 toast({
@@ -119,12 +116,13 @@ export function BaselineTable({ data }: Props) {
         },
     })
 
-    const confirmDeleteBaseline = async () => {
-        if (BaselineToDelete) {
+    const confirmDeleteEffort = async () => {
+        if (EffortToDelete) {
             resetDeleteAction()
             try {
                 await executeDelete({
-                    baselineId: BaselineToDelete.baseline_id,
+                    effortId: EffortToDelete.effort_id,
+                    baselineId: EffortToDelete.baseline_id,
                 })
             } catch (error) {
                 if (error instanceof Error) {
@@ -137,112 +135,95 @@ export function BaselineTable({ data }: Props) {
             }
         }
         setShowDeleteConfirmation(false)
-        setBaselineToDelete(null)
+        setEffortToDelete(null)
     }
 
-    const columnHeadersArray: Array<keyof GetBaseline> = [
-        "code",
-        "review",
-        "title",
-        "manager",
-        "estimator",
-        "description",
+    const columnHeadersArray: Array<keyof GetEffort> = [
+        "competence_code",
+        "competence_name",
+        "hours",
+        "comment",
     ]
 
     const columnDefs: Partial<{
-        [K in keyof GetBaseline]: {
+        [K in keyof GetEffort]: {
             label: string
-            align?: "left" | "center" | "right"
             width?: number
             filterable?: boolean
+            transform?: (value: unknown) => string
+            presenter?: ({ value }: { value: unknown }) => JSX.Element
         }
     }> = {
-        code: { label: "Code", width: 150, filterable: true },
-        review: { label: "Rev", width: 1, filterable: false },
-        title: { label: "Title", width: 255, filterable: true },
-        manager: { label: "Manager", width: 1, filterable: true },
-        estimator: { label: "System Architect", width: 1, filterable: true },
-        description: { label: "Description", width: 255, filterable: false },
+        competence_code: {
+            label: "Code",
+            width: 100,
+            filterable: true,
+        },
+        competence_name: {
+            label: "Name",
+            width: 255,
+            filterable: true,
+        },
+        hours: {
+            label: "Hours",
+            width: 100,
+            filterable: false,
+            presenter: Hours,
+        },
+        comment: {
+            label: "Comment",
+            width: 500,
+            filterable: true,
+        },
     }
 
-    const columnHelper = createColumnHelper<GetBaseline>()
+    const columnHelper = createColumnHelper<GetEffort>()
 
-    const ActionsCell = ({ row }: CellContext<GetBaseline, unknown>) => (
-        <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="h-8 w-8 p-0">
-                    <span className="sr-only">Open Menu</span>
-                    <MoreHorizontal className="h-4 w-4" />
-                </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Options</DropdownMenuLabel>
-
-                <DropdownMenuSub>
-                    <DropdownMenuSubTrigger>
-                        <HandshakeIcon className="mr-2 h-4 w-4" />
-                        <span>Baseline</span>
-                    </DropdownMenuSubTrigger>
-                    <DropdownMenuPortal>
-                        <DropdownMenuSubContent>
-                            <DropdownMenuItem asChild>
-                                <Link
-                                    href={`/baselines/form?baselineId=${row.original.baseline_id}`}
-                                    className="flex w-full"
-                                    prefetch={false}
-                                >
-                                    <Edit className="mr-2 h-4 w-4" />
-                                    <span>Edit</span>
-                                </Link>
-                            </DropdownMenuItem>
-
-                            <DropdownMenuItem
-                                onClick={() =>
-                                    handleDeleteBaseline(row.original)
-                                }
+    const ActionsCell = ({ row }: CellContext<GetEffort, unknown>) => {
+        return (
+            <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="h-8 w-8 p-0">
+                        <span className="sr-only">Open Menu</span>
+                        <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                    <DropdownMenuLabel>Options</DropdownMenuLabel>
+                    <DropdownMenuGroup>
+                        <DropdownMenuItem asChild>
+                            <Link
+                                href={`/baselines/${row.original.baseline_id}/efforts/form`}
+                                className="flex w-full"
+                                prefetch={false}
                             >
-                                <Trash className="mr-2 h-4 w-4" />
-                                <span>Delete</span>
-                            </DropdownMenuItem>
-                        </DropdownMenuSubContent>
-                    </DropdownMenuPortal>
-                </DropdownMenuSub>
+                                <Plus className="mr-2 h-4 w-4" />
+                                <span>Add</span>
+                            </Link>
+                        </DropdownMenuItem>
 
-                <DropdownMenuSub>
-                    <DropdownMenuSubTrigger>
-                        <FileIcon className="mr-2 h-4 w-4" />
-                        <span>Cost</span>
-                    </DropdownMenuSubTrigger>
+                        <DropdownMenuItem asChild>
+                            <Link
+                                href={`/baselines/${row.original.baseline_id}/efforts/form?effortId=${row.original.effort_id}`}
+                                className="flex w-full"
+                                prefetch={false}
+                            >
+                                <Edit className="mr-2 h-4 w-4" />
+                                <span>Edit</span>
+                            </Link>
+                        </DropdownMenuItem>
 
-                    <DropdownMenuPortal>
-                        <DropdownMenuSubContent>
-                            <DropdownMenuItem asChild>
-                                <Link
-                                    href={`/baselines/${row.original.baseline_id}/costs/form`}
-                                    className="flex w-full"
-                                    prefetch={false}
-                                >
-                                    <Plus className="mr-2 h-4 w-4" />
-                                    <span>Add</span>
-                                </Link>
-                            </DropdownMenuItem>
-
-                            <DropdownMenuItem asChild>
-                                <Link
-                                    href={`/baselines/${row.original.baseline_id}/costs`}
-                                    className="flex w-full"
-                                    prefetch={false}
-                                >
-                                    <Edit className="mr-2 h-4 w-4" />
-                                    <span>Edit</span>
-                                </Link>
-                            </DropdownMenuItem>
-                        </DropdownMenuSubContent>
-                    </DropdownMenuPortal>
-                </DropdownMenuSub>
-            </DropdownMenuContent>
-        </DropdownMenu>
-    )
+                        <DropdownMenuItem
+                            onClick={() => handleDeleteEffort(row.original)}
+                        >
+                            <Trash className="mr-2 h-4 w-4" />
+                            <span>Delete</span>
+                        </DropdownMenuItem>
+                    </DropdownMenuGroup>
+                </DropdownMenuContent>
+            </DropdownMenu>
+        )
+    }
 
     ActionsCell.displayName = "ActionsCell"
 
@@ -257,24 +238,13 @@ export function BaselineTable({ data }: Props) {
                 (row) => {
                     // transformational
                     const value = row[columnName]
-                    // if (
-                    //     columnName === "revisionDate" &&
-                    //     typeof value === "string"
-                    // ) {
-                    //     return value
-                    //         ? new Intl.DateTimeFormat("pt-BR", {
-                    //               year: "numeric",
-                    //               month: "2-digit",
-                    //               day: "2-digit",
-                    //           }).format(
-                    //               new Date(
-                    //                   +value.substring(0, 4),
-                    //                   +value.substring(5, 7) - 1,
-                    //                   +value.substring(8, 10),
-                    //               ),
-                    //           )
-                    //         : ""
-                    // }
+                    const transformFn =
+                        columnDefs[columnName as keyof typeof columnDefs]
+                            ?.transform
+                    if (transformFn) {
+                        return transformFn(value)
+                    }
+
                     return value
                 },
                 {
@@ -319,37 +289,20 @@ export function BaselineTable({ data }: Props) {
                     cell: (info) => {
                         // presentational
 
-                        // if (columnName === "isRevised") {
-                        //     return (
-                        //         <div className="grid place-content-center">
-                        //             {info.getValue() === false ? (
-                        //                 <CircleXIcon className="opacity-25" />
-                        //             ) : (
-                        //                 <CircleCheckIcon className="text-green-600" />
-                        //             )}
-                        //         </div>
-                        //     )
-                        // }
-
-                        const formatStringValue = () => {
-                            const value = info.getValue()
-                            if (
-                                columnName === "description" &&
-                                typeof value === "string"
-                            ) {
-                                return value.length > 80
-                                    ? `${value.substring(0, 80)}...`
-                                    : value
-                            }
-                            return value?.toString()
-                        }
+                        const presenterFn =
+                            columnDefs[columnName as keyof typeof columnDefs]
+                                ?.presenter
 
                         return (
                             <Link
-                                href={`/baselines/form?baselineId=${info.row.original.baseline_id}`}
+                                href={`/baselines/${info.row.original.baseline_id}/efforts/form?effortId=${info.row.original.effort_id}`}
                                 prefetch={false}
                             >
-                                <div>{formatStringValue()}</div>
+                                {presenterFn ? (
+                                    presenterFn({ value: info.getValue() })
+                                ) : (
+                                    <div>{info.getValue()?.toString()}</div>
+                                )}
                             </Link>
                         )
                     },
@@ -395,9 +348,8 @@ export function BaselineTable({ data }: Props) {
     }, [table.getState().columnFilters]) // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
-        <div className="mt-6 flex flex-col gap-4">
-            <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold">Baselines List</h2>
+        <div className="flex flex-col gap-1 sm:px-8">
+            <EffortHeader title="Efforts List" baseline={baseline}>
                 <div className="flex items-center space-x-2">
                     <Switch
                         id="filterToggle"
@@ -408,7 +360,22 @@ export function BaselineTable({ data }: Props) {
                         Filter
                     </Label>
                 </div>
-            </div>
+            </EffortHeader>
+
+            {data.length === 0 && (
+                <div>
+                    <Button variant="ghost" asChild>
+                        <Link
+                            href={`/baselines/${baseline.baseline_id}/efforts/form`}
+                            prefetch={false}
+                        >
+                            <Plus className="h-4 w-4" />
+                            <span>Add First Effort</span>
+                        </Link>
+                    </Button>
+                </div>
+            )}
+
             <div className="overflow-hidden rounded-lg border border-border">
                 <Table className="border">
                     <TableHeader>
@@ -544,9 +511,9 @@ export function BaselineTable({ data }: Props) {
             <AlertConfirmation
                 open={showDeleteConfirmation}
                 setOpen={setShowDeleteConfirmation}
-                confirmationAction={confirmDeleteBaseline}
+                confirmationAction={confirmDeleteEffort}
                 title="Are you sure you want to delete this Baseline?"
-                message={`This action cannot be undone. This will permanently delete the Baseline ${BaselineToDelete?.code}}.`}
+                message={`This action cannot be undone. This will permanently delete the Effort ${EffortToDelete?.competence_name}.`}
             />
             {isDeleting && <Deleting />}
         </div>

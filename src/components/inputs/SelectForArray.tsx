@@ -23,7 +23,6 @@ type DataObj = {
 }
 
 type Props<Schema> = {
-    // fieldTitle: string
     nameInSchema: keyof Schema & string
     data: DataObj[]
     className?: string
@@ -31,7 +30,6 @@ type Props<Schema> = {
 }
 
 export function SelectForArray<Schema>({
-    // fieldTitle,
     nameInSchema,
     data,
     className,
@@ -45,13 +43,6 @@ export function SelectForArray<Schema>({
             name={fieldArrayName ?? nameInSchema}
             render={({ field }) => (
                 <FormItem>
-                    {/* <FormLabel
-                        className="text-base font-semibold"
-                        htmlFor={fieldArrayName ?? nameInSchema}
-                    >
-                        {fieldTitle}
-                    </FormLabel> */}
-
                     <Select {...field} onValueChange={field.onChange}>
                         <FormControl>
                             <SelectTrigger

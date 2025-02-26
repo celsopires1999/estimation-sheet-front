@@ -1,6 +1,6 @@
 import { getBaseline } from "@/lib/queries/baselines"
-import { getCostsByBaselineId } from "@/lib/queries/costs"
-import { CostTable } from "./CostTable"
+import { getEffortsByBaselineId } from "@/lib/queries/efforts"
+import { EffortTable } from "./EffortTable"
 
 export async function generateMetadata({
     params,
@@ -16,11 +16,11 @@ export async function generateMetadata({
     }
 
     return {
-        title: `Costs for Baseline #${baselineId}`,
+        title: `Efforts for Baseline #${baselineId}`,
     }
 }
 
-export default async function CostsPage({
+export default async function EffortsPage({
     params,
 }: {
     params: Promise<{ baselineId: string }>
@@ -29,9 +29,9 @@ export default async function CostsPage({
 
     try {
         const baseline = await getBaseline(baselineId)
-        const costs = await getCostsByBaselineId(baselineId)
+        const efforts = await getEffortsByBaselineId(baselineId)
 
-        return <CostTable baseline={baseline} data={costs} />
+        return <EffortTable baseline={baseline} data={efforts} />
     } catch (error) {
         if (error instanceof Error) {
             return <p className="mt-4">Error: ${error.message}</p>

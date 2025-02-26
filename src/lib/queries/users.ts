@@ -1,3 +1,5 @@
+import "server-only"
+
 import { GetUser, GetUsersBody } from "@/models"
 
 export async function getUsers(): Promise<GetUser[]> {
