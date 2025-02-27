@@ -1,9 +1,12 @@
 import {
-    FileIcon,
-    HomeIcon,
-    HandshakeIcon,
     CpuIcon,
     EuroIcon,
+    GoalIcon,
+    HomeIcon,
+    MapIcon,
+    MapPinnedIcon,
+    MedalIcon,
+    ScanFaceIcon,
 } from "lucide-react"
 import Link from "next/link"
 // import { LogoutLink } from "@kinde-oss/kinde-auth-nextjs/components"
@@ -31,7 +34,7 @@ export function Header() {
                 </div>
                 <div className="flex items-center">
                     <NavButtonMenu
-                        icon={HandshakeIcon}
+                        icon={MapPinnedIcon}
                         label="Baselines"
                         choices={[
                             { title: "Search Baselines", href: "/baselines" },
@@ -42,10 +45,19 @@ export function Header() {
                         ]}
                     />
 
-                    <NavButton
-                        icon={FileIcon}
-                        label="Services"
-                        href="/services"
+                    <NavButtonMenu
+                        icon={ScanFaceIcon}
+                        label="Competences"
+                        choices={[
+                            {
+                                title: "Search Competences",
+                                href: "/competences",
+                            },
+                            {
+                                title: "New Competence",
+                                href: "/competences/form",
+                            },
+                        ]}
                     />
 
                     <NavButtonMenu

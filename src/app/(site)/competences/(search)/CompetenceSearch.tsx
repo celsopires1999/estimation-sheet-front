@@ -6,13 +6,13 @@ type Props = {
     searchText?: string
 }
 
-export async function BaselineSearch({ searchText }: Props) {
+export async function CompetenceSearch({ searchText }: Props) {
     return (
-        <Form action="/baselines" className="flex items-center gap-2">
+        <Form action="/competences" className="flex items-center gap-2">
             <Input
                 type="text"
                 name="searchText"
-                placeholder="Search Baselines"
+                placeholder="Search Competences"
                 className="w-full"
                 defaultValue={searchText}
                 autoFocus

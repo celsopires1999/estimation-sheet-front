@@ -94,7 +94,7 @@ export function BaselineForm({
         }
     }
 
-    let baselineId = baseline?.baseline_id ?? saveResult.data?.baseline_id
+    const baselineId = baseline?.baseline_id ?? saveResult.data?.baseline_id
 
     return (
         <div className="flex flex-col gap-1 sm:px-8">

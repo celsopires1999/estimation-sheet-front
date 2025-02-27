@@ -31,7 +31,7 @@ export async function getBaseline(baselineID: string): Promise<GetBaseline> {
         `${process.env.NEXT_API_URL}/baselines/${baselineID}`,
     )
     if (!response.ok) {
-        throw new Error("Failed to fetch baselines")
+        throw new Error("Failed to fetch baseline")
     }
     const data: GetBaseline = await response.json()
     return data

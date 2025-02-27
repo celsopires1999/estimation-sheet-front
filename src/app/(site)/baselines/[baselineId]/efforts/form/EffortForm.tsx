@@ -1,12 +1,8 @@
 "use client"
 
 import { DisplayServerActionResponse } from "@/components/DisplayServerActionResponse"
-import { CheckboxWithLabel } from "@/components/inputs/CheckboxWithLabel"
-import { InputDecimalForArray } from "@/components/inputs/InputDecimalForArray"
-import { InputDecimalWithLabel } from "@/components/inputs/InputDecimalWithLabel"
 import { InputWithLabel } from "@/components/inputs/InputWithLabel"
 import { SelectForArray } from "@/components/inputs/SelectForArray"
-import { SelectWithLabel } from "@/components/inputs/SelectWithLabel"
 import { TextAreaWithLabel } from "@/components/inputs/TextAreaWithLabel"
 import { Button } from "@/components/ui/button"
 import {
@@ -19,32 +15,23 @@ import {
 import { Form } from "@/components/ui/form"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
-import { toDecimal } from "@/lib/utils"
-import {
-    CompetenceOption,
-    CostTypeOptions,
-    CurrencyOptions,
-    GetBaseline,
-    GetEffort,
-    TaxOptions,
-} from "@/models"
+import { CompetenceOption, GetBaseline, GetEffort } from "@/models"
 import { zodResolver } from "@hookform/resolvers/zod"
-import Decimal from "decimal.js"
 import { LoaderCircle, Trash } from "lucide-react"
 import { useAction } from "next-safe-action/hooks"
 // import Link from "next/link"
 import { saveEffortAction } from "@/actions/saveEffortAction"
+import { ComboboxWithLabel } from "@/components/inputs/ComboboxWithLabel"
+import { InputForArray } from "@/components/inputs/InputForArray"
 import { Switch } from "@/components/ui/switch"
-import { useState } from "react"
-import { Control, useFieldArray, useForm, useWatch } from "react-hook-form"
-import { EffortHeader } from "../components/EffortHeader"
 import {
     SaveEffortAllocationType,
     saveEffortSchema,
     SaveEffortType,
 } from "@/zod-schemas/effort"
-import { ComboboxWithLabel } from "@/components/inputs/ComboboxWithLabel"
-import { InputForArray } from "@/components/inputs/InputForArray"
+import { useState } from "react"
+import { Control, useFieldArray, useForm, useWatch } from "react-hook-form"
+import { EffortHeader } from "../components/EffortHeader"
 
 type Props = {
     baseline: GetBaseline
