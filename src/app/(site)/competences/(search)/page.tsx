@@ -1,12 +1,13 @@
 import { CompetenceSearch } from "./CompetenceSearch"
 import { getCompetenceSearchResults } from "@/lib/queries/competences"
 import { CompetenceTable } from "./CompetenceTable"
+import { ListSearch } from "@/components/ListSearch"
 
 export const metadata = {
-    title: "Baseline Search",
+    title: "Competence Search",
 }
 
-export default async function BaselinesPage({
+export default async function CompetencesPage({
     searchParams,
 }: {
     searchParams: Promise<{ [key: string]: string | undefined }>
@@ -16,7 +17,11 @@ export default async function BaselinesPage({
     if (!searchText) {
         return (
             <div>
-                <CompetenceSearch searchText="" />
+                <ListSearch
+                    searchText=""
+                    action="/competences"
+                    placeholder="Search Competences"
+                />
                 <div className="mt-6 flex flex-col gap-4">
                     <h2 className="text-2xl font-bold">Competences List</h2>
                     <p className="mt-2">You can search by:</p>
@@ -40,7 +45,11 @@ export default async function BaselinesPage({
         const results = await getCompetenceSearchResults(searchText)
         return (
             <div>
-                <CompetenceSearch searchText={searchText} />
+                <ListSearch
+                    searchText={searchText}
+                    action="/competences"
+                    placeholder="Search Competences"
+                />
                 {results.length ? (
                     <CompetenceTable data={results} />
                 ) : (

@@ -1,12 +1,9 @@
 import {
-    CpuIcon,
+    CrownIcon,
     EuroIcon,
-    GoalIcon,
     HomeIcon,
-    MapIcon,
-    MapPinnedIcon,
-    MedalIcon,
-    ScanFaceIcon,
+    PickaxeIcon,
+    UsersRoundIcon,
 } from "lucide-react"
 import Link from "next/link"
 // import { LogoutLink } from "@kinde-oss/kinde-auth-nextjs/components"
@@ -34,7 +31,7 @@ export function Header() {
                 </div>
                 <div className="flex items-center">
                     <NavButtonMenu
-                        icon={MapPinnedIcon}
+                        icon={CrownIcon}
                         label="Baselines"
                         choices={[
                             { title: "Search Baselines", href: "/baselines" },
@@ -46,7 +43,7 @@ export function Header() {
                     />
 
                     <NavButtonMenu
-                        icon={ScanFaceIcon}
+                        icon={PickaxeIcon}
                         label="Competences"
                         choices={[
                             {
@@ -61,18 +58,21 @@ export function Header() {
                     />
 
                     <NavButtonMenu
-                        icon={CpuIcon}
-                        label="Systems"
+                        icon={UsersRoundIcon}
+                        label="Users"
                         choices={[
-                            { title: "Search Systems", href: "/systems" },
-                            { title: "New System", href: "/systems/form" },
+                            { title: "Search Users", href: "/users" },
+                            { title: "New User", href: "/users/form" },
                         ]}
                     />
 
-                    <NavButton
+                    <NavButtonMenu
                         icon={EuroIcon}
-                        label="Company Plans"
-                        href="/plans"
+                        label="Plans"
+                        choices={[
+                            { title: "Search Plans", href: "/plans" },
+                            { title: "New Plan", href: "/plans/form" },
+                        ]}
                     />
 
                     <ModeToggle />

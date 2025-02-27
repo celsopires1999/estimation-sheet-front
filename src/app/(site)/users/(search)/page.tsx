@@ -1,12 +1,12 @@
-import { getBaselineSearchResults } from "@/lib/queries/baselines"
-import { BaselineTable } from "./BaselineTable"
+import { getUserSearchResults } from "@/lib/queries/users"
+import { UserTable } from "./UserTable"
 import { ListSearch } from "@/components/ListSearch"
 
 export const metadata = {
-    title: "Baseline Search",
+    title: "User Search",
 }
 
-export default async function BaselinesPage({
+export default async function UsersPage({
     searchParams,
 }: {
     searchParams: Promise<{ [key: string]: string | undefined }>
@@ -18,18 +18,23 @@ export default async function BaselinesPage({
             <div>
                 <ListSearch
                     searchText=""
-                    action="/baselines"
-                    placeholder="Search Baselines"
+                    action="/users"
+                    placeholder="Search Users"
                 />
                 <div className="mt-6 flex flex-col gap-4">
-                    <h2 className="text-2xl font-bold">Baselines List</h2>
+                    <h2 className="text-2xl font-bold">Users List</h2>
                     <p className="mt-2">You can search by:</p>
                     <ul className="-mt-2 list-disc pl-6">
-                        <li>Code</li>
-                        <li>Title</li>
-                        <li>Description</li>
-                        <li>Manager</li>
-                        <li>Solution Architect</li>
+                        <li>Email</li>
+                        <li>User Name</li>
+                        <li>Name</li>
+                        <li>
+                            Enter{" "}
+                            <span className="font-bold">
+                                {"/ (slash character)"}
+                            </span>{" "}
+                            for all users
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -37,18 +42,18 @@ export default async function BaselinesPage({
     }
 
     try {
-        const results = await getBaselineSearchResults(searchText)
+        const results = await getUserSearchResults(searchText)
         return (
             <div>
                 <ListSearch
                     searchText={searchText}
-                    action="/baselines"
-                    placeholder="Search Baselines"
+                    action="/users"
+                    placeholder="Search Users"
                 />
                 {results.length ? (
-                    <BaselineTable data={results} />
+                    <UserTable data={results} />
                 ) : (
-                    <p className="mt-4">No Baselines found</p>
+                    <p className="mt-4">No Users found</p>
                 )}
             </div>
         )

@@ -1,9 +1,8 @@
 import { BackButton } from "@/components/BackButton"
-import { getBaseline } from "@/lib/queries/baselines"
-import { BaselineForm } from "./BaselineForm"
-import { getUsers } from "@/lib/queries/users"
-import { ManagerOption, SolutionArchitectOption } from "@/models"
 import { MonthOptions, YearsOptions } from "@/data"
+import { getBaseline } from "@/lib/queries/baselines"
+import { getUserOptions } from "@/lib/queries/users"
+import { BaselineForm } from "./BaselineForm"
 
 export async function generateMetadata({
     searchParams,
@@ -31,15 +30,7 @@ export default async function BaselineFormPage({
     try {
         const { baselineId } = await searchParams
 
-        const usersResult = await getUsers()
-
-        const solutionArchitects: SolutionArchitectOption[] = usersResult.map(
-            ({ user_id, name }) => ({ id: user_id, description: name }),
-        )
-
-        const managers: ManagerOption[] = usersResult
-            .filter(({ user_type }) => user_type === "manager")
-            .map(({ user_id, name }) => ({ id: user_id, description: name }))
+        const { solutionArchitects, managers } = await getUserOptions()
 
         if (baselineId) {
             const baseline = await getBaseline(baselineId)
