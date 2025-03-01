@@ -1,12 +1,12 @@
 import { ListSearch } from "@/components/ListSearch"
-import { getCompetenceSearchResults } from "@/lib/queries/competences"
-import { CompetenceTable } from "./CompetenceTable"
+import { getPlanSearchResults } from "@/lib/queries/plans"
+import { PlanTable } from "./PlanTable"
 
 export const metadata = {
-    title: "Competence Search",
+    title: "Plan Search",
 }
 
-export default async function CompetencesPage({
+export default async function PlansPage({
     searchParams,
 }: {
     searchParams: Promise<{ [key: string]: string | undefined }>
@@ -18,11 +18,11 @@ export default async function CompetencesPage({
             <div>
                 <ListSearch
                     searchText=""
-                    action="/competences"
-                    placeholder="Search Competences"
+                    action="/plans"
+                    placeholder="Search Plans"
                 />
                 <div className="mt-6 flex flex-col gap-4">
-                    <h2 className="text-2xl font-bold">Competences List</h2>
+                    <h2 className="text-2xl font-bold">Plans List</h2>
                     <p className="mt-2">You can search by:</p>
                     <ul className="-mt-2 list-disc pl-6">
                         <li>Code</li>
@@ -32,7 +32,7 @@ export default async function CompetencesPage({
                             <span className="font-bold">
                                 {"/ (slash character)"}
                             </span>{" "}
-                            for all competences
+                            for all plans
                         </li>
                     </ul>
                 </div>
@@ -41,18 +41,18 @@ export default async function CompetencesPage({
     }
 
     try {
-        const results = await getCompetenceSearchResults(searchText)
+        const results = await getPlanSearchResults(searchText)
         return (
             <div>
                 <ListSearch
                     searchText={searchText}
-                    action="/competences"
-                    placeholder="Search Competences"
+                    action="/users"
+                    placeholder="Search Users"
                 />
                 {results.length ? (
-                    <CompetenceTable data={results} />
+                    <PlanTable data={results} />
                 ) : (
-                    <p className="mt-4">No Competences found</p>
+                    <p className="mt-4">No Users found</p>
                 )}
             </div>
         )

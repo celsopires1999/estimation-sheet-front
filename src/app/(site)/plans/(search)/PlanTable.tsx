@@ -1,5 +1,5 @@
 "use client"
-import { deleteCompetenceAction } from "@/actions/deleteCompetenceAction"
+import { deletePlanAction } from "@/actions/deletePlanAction"
 import { AlertConfirmation } from "@/components/AlertConfirmation"
 import Deleting from "@/components/Deleting"
 import { Filter } from "@/components/react-table/Filter"
@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/table"
 import { toast } from "@/hooks/use-toast"
 import { useTableStateHelper } from "@/hooks/useTableStateHelper"
-import { Competence } from "@/models"
+import { Plan } from "@/models"
 import {
     CellContext,
     createColumnHelper,
@@ -40,9 +40,10 @@ import {
 import {
     ArrowDown,
     ArrowUp,
-    Edit,
+    CopyIcon,
+    EditIcon,
     MoreHorizontal,
-    Plus,
+    PlusIcon,
     TableOfContents,
     Trash,
 } from "lucide-react"
@@ -52,17 +53,16 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { JSX, useEffect, useState } from "react"
 
 type Props = {
-    data: Competence[]
+    data: Plan[]
 }
 
-export function CompetenceTable({ data }: Props) {
+export function PlanTable({ data }: Props) {
     const router = useRouter()
 
     const searchParams = useSearchParams()
 
     const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false)
-    const [CompetenceToDelete, setCompetenceToDelete] =
-        useState<Competence | null>(null)
+    const [planToDelete, setPlanToDelete] = useState<Plan | null>(null)
 
     const [
         filterToggle,
@@ -78,8 +78,8 @@ export function CompetenceTable({ data }: Props) {
         handleColumnFilters,
     ] = useTableStateHelper()
 
-    const handleDeleteCompetence = (competence: Competence) => {
-        setCompetenceToDelete(competence)
+    const handleDeletePlan = (plan: Plan) => {
+        setPlanToDelete(plan)
         setShowDeleteConfirmation(true)
     }
 
@@ -95,7 +95,7 @@ export function CompetenceTable({ data }: Props) {
         executeAsync: executeDelete,
         isPending: isDeleting,
         reset: resetDeleteAction,
-    } = useAction(deleteCompetenceAction, {
+    } = useAction(deletePlanAction, {
         onSuccess({ data }) {
             if (data?.message) {
                 toast({
@@ -114,12 +114,12 @@ export function CompetenceTable({ data }: Props) {
         },
     })
 
-    const confirmDeleteCompetence = async () => {
-        if (CompetenceToDelete) {
+    const confirmDeletePlan = async () => {
+        if (planToDelete) {
             resetDeleteAction()
             try {
                 await executeDelete({
-                    competenceId: CompetenceToDelete.competence_id,
+                    planId: planToDelete.plan_id,
                 })
             } catch (error) {
                 if (error instanceof Error) {
@@ -132,13 +132,13 @@ export function CompetenceTable({ data }: Props) {
             }
         }
         setShowDeleteConfirmation(false)
-        setCompetenceToDelete(null)
+        setPlanToDelete(null)
     }
 
-    const columnHeadersArray: Array<keyof Competence> = ["code", "name"]
+    const columnHeadersArray: Array<keyof Plan> = ["code", "name"]
 
     const columnDefs: Partial<{
-        [K in keyof Competence]: {
+        [K in keyof Plan]: {
             label: string
             width?: number
             filterable?: boolean
@@ -146,13 +146,19 @@ export function CompetenceTable({ data }: Props) {
             presenter?: ({ value }: { value: unknown }) => JSX.Element
         }
     }> = {
-        code: { label: "Code", width: 150, filterable: true },
-        name: { label: "Name", width: 255, filterable: true },
+        code: {
+            label: "Code",
+            filterable: true,
+        },
+        name: {
+            label: "Name",
+            filterable: true,
+        },
     }
 
-    const columnHelper = createColumnHelper<Competence>()
+    const columnHelper = createColumnHelper<Plan>()
 
-    const ActionsCell = ({ row }: CellContext<Competence, unknown>) => {
+    const ActionsCell = ({ row }: CellContext<Plan, unknown>) => {
         return (
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -166,28 +172,39 @@ export function CompetenceTable({ data }: Props) {
                     <DropdownMenuGroup>
                         <DropdownMenuItem asChild>
                             <Link
-                                href={`/competences/form`}
+                                href={`/plans/form`}
                                 className="flex w-full"
                                 prefetch={false}
                             >
-                                <Plus className="mr-2 h-4 w-4" />
+                                <PlusIcon className="mr-2 h-4 w-4" />
                                 <span>Add</span>
                             </Link>
                         </DropdownMenuItem>
 
                         <DropdownMenuItem asChild>
                             <Link
-                                href={`/competences/form?competenceId=${row.original.competence_id}`}
+                                href={`/plans/form?planId=${row.original.plan_id}`}
                                 className="flex w-full"
                                 prefetch={false}
                             >
-                                <Edit className="mr-2 h-4 w-4" />
+                                <EditIcon className="mr-2 h-4 w-4" />
                                 <span>Edit</span>
                             </Link>
                         </DropdownMenuItem>
 
+                        <DropdownMenuItem asChild>
+                            <Link
+                                href={`/plans/form?planId=${row.original.plan_id}&copy=true`}
+                                className="flex w-full"
+                                prefetch={false}
+                            >
+                                <CopyIcon className="mr-2 h-4 w-4" />
+                                <span>Copy</span>
+                            </Link>
+                        </DropdownMenuItem>
+
                         <DropdownMenuItem
-                            onClick={() => handleDeleteCompetence(row.original)}
+                            onClick={() => handleDeletePlan(row.original)}
                         >
                             <Trash className="mr-2 h-4 w-4" />
                             <span>Delete</span>
@@ -266,7 +283,7 @@ export function CompetenceTable({ data }: Props) {
 
                         return (
                             <Link
-                                href={`/competences/form?competenceId=${info.row.original.competence_id}`}
+                                href={`/plans/form?planId=${info.row.original.plan_id}`}
                                 prefetch={false}
                             >
                                 {presenterFn ? (
@@ -319,9 +336,9 @@ export function CompetenceTable({ data }: Props) {
     }, [table.getState().columnFilters]) // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
-        <div className="mt-6 flex max-w-screen-md flex-col gap-4">
+        <div className="mt-6 flex max-w-screen-lg flex-col gap-4">
             <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold">Competences List</h2>
+                <h2 className="text-2xl font-bold">Users List</h2>
                 <div className="flex items-center space-x-2">
                     <Switch
                         id="filterToggle"
@@ -468,9 +485,9 @@ export function CompetenceTable({ data }: Props) {
             <AlertConfirmation
                 open={showDeleteConfirmation}
                 setOpen={setShowDeleteConfirmation}
-                confirmationAction={confirmDeleteCompetence}
-                title="Are you sure you want to delete this Competence?"
-                message={`This action cannot be undone. This will permanently delete the Competence ${CompetenceToDelete?.code}}.`}
+                confirmationAction={confirmDeletePlan}
+                title="Are you sure you want to delete this Plan?"
+                message={`This action cannot be undone. This will permanently delete the Plan ${planToDelete?.name}.`}
             />
             {isDeleting && <Deleting />}
         </div>
