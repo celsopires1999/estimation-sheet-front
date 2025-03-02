@@ -1,60 +1,41 @@
 "use client"
 
-import { savePlanAction } from "@/actions/savePlanAction"
 import { DisplayServerActionResponse } from "@/components/DisplayServerActionResponse"
-import { CheckboxWithLabel } from "@/components/inputs/CheckboxWithLabel"
 import { InputWithLabel } from "@/components/inputs/InputWithLabel"
 import { Button } from "@/components/ui/button"
 import { Form } from "@/components/ui/form"
 import { useToast } from "@/hooks/use-toast"
-import { Currency, Plan, PlanType, PlanTypeOptions } from "@/models"
-import { savePlanSchema, SavePlanType } from "@/zod-schemas/plan"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { LoaderCircle } from "lucide-react"
 import { useAction } from "next-safe-action/hooks"
+// import Link from "next/link"
+import { createPortfolioAction } from "@/actions/createPortfolioAction"
+import { ComboboxWithLabel } from "@/components/inputs/ComboboxWithLabel"
+import { GetBaseline, PreliminaryPlanOption } from "@/models"
+import {
+    CreatePortfolioType,
+    createPortfolioSchema,
+} from "@/zod-schemas/portfolio"
 import { useForm } from "react-hook-form"
-import { Assumptions } from "./Assumptions"
-import { SelectWithLabel } from "@/components/inputs/SelectWithLabel"
+import { PreliminaryHeader } from "../components/PreliminaryHeader"
 
 type Props = {
-    plan?: Plan
-    copy?: boolean
+    baseline: GetBaseline
+    plans: PreliminaryPlanOption[]
 }
 
-export function PlanForm({ plan, copy }: Props) {
+export function PreliminaryForm({ baseline, plans }: Props) {
     const { toast } = useToast()
 
-    const defaultValues: SavePlanType = {
-        plan_id: plan?.plan_id ? (copy ? "(New)" : plan.plan_id) : "(New)",
-        plan_type: plan?.plan_type
-            ? (plan.plan_type as PlanType)
-            : PlanType.Preliminary,
-        code: plan?.code ?? "",
-        name: plan?.name ?? "",
-        assumptions: plan?.assumptions
-            ? plan.assumptions.map((a) => ({
-                  year: a.year.toString(),
-                  inflation: a.inflation.toString(),
-                  currencies: a.currencies.map((c) => ({
-                      currency: c.currency as Currency,
-                      exchange: c.exchange.toString(),
-                  })),
-              }))
-            : [
-                  {
-                      year: "2023",
-                      inflation: "0.00",
-                      currencies: [
-                          { currency: Currency.USD, exchange: "0.00" },
-                          { currency: Currency.EUR, exchange: "0.00" },
-                      ],
-                  },
-              ],
+    const defaultValues: CreatePortfolioType = {
+        baseline_id: baseline.baseline_id,
+        plan_id: "",
+        shift_months: 1,
     }
 
-    const form = useForm<SavePlanType>({
+    const form = useForm<CreatePortfolioType>({
         mode: "onBlur",
-        resolver: zodResolver(savePlanSchema),
+        resolver: zodResolver(createPortfolioSchema),
         defaultValues,
     })
 
@@ -63,7 +44,7 @@ export function PlanForm({ plan, copy }: Props) {
         result: saveResult,
         isPending: isSaving,
         reset: resetSaveAction,
-    } = useAction(savePlanAction, {
+    } = useAction(createPortfolioAction, {
         onSuccess({ data }) {
             if (data?.message) {
                 toast({
@@ -83,7 +64,7 @@ export function PlanForm({ plan, copy }: Props) {
         },
     })
 
-    async function submitForm(data: SavePlanType) {
+    async function submitForm(data: CreatePortfolioType) {
         resetSaveAction()
         try {
             await executeSave(data)
@@ -101,45 +82,37 @@ export function PlanForm({ plan, copy }: Props) {
     return (
         <div className="flex flex-col gap-1 sm:px-8">
             <DisplayServerActionResponse result={saveResult} />
-            <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold">
-                    {plan?.plan_id ? (copy ? "Copy" : "Edit") : "New"} Plan
-                </h2>
-            </div>
+            <PreliminaryHeader
+                title="New Preliminary"
+                baseline={baseline}
+                children
+            />
 
             <Form {...form}>
                 <form
                     onSubmit={form.handleSubmit(submitForm)}
                     className="flex flex-col gap-4 md:flex-row md:gap-8"
                 >
-                    <div className="flex w-full flex-col gap-8">
-                        <div className="flex items-start justify-between gap-4">
-                            <div className="w-1/3">
-                                <SelectWithLabel<SavePlanType>
-                                    fieldTitle="Type"
-                                    nameInSchema="plan_type"
-                                    data={PlanTypeOptions}
-                                    className="max-w-full"
-                                />
-                            </div>
-
-                            <div className="w-2/3">
-                                <InputWithLabel<SavePlanType>
-                                    fieldTitle="Code"
-                                    nameInSchema="code"
-                                    className="max-w-full"
-                                />
-                            </div>
-                        </div>
-
-                        <InputWithLabel<SavePlanType>
-                            fieldTitle="Name"
-                            nameInSchema="name"
+                    <div className="flex w-full max-w-lg flex-col gap-4">
+                        <ComboboxWithLabel<CreatePortfolioType>
+                            fieldTitle="Plan"
+                            nameInSchema="plan_id"
+                            data={plans ?? []}
                             className="max-w-full"
                         />
 
-                        <Assumptions />
+                        <InputWithLabel<CreatePortfolioType>
+                            fieldTitle="Shift Months"
+                            nameInSchema="shift_months"
+                            type="number"
+                            step={1}
+                            min={1}
+                            max={999_999}
+                            className="max-w-full"
+                        />
+                    </div>
 
+                    <div className="flex w-full max-w-lg flex-col gap-4">
                         <div className="flex max-w-xs gap-2">
                             <Button
                                 type="submit"

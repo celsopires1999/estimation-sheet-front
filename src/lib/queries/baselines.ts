@@ -13,6 +13,10 @@ export async function getBaselineSearchResults(
 
     const data: GetBaselinesBody = await response.json()
 
+    if (searchText === "/") {
+        return data.baselines
+    }
+
     return data.baselines.filter((baseline) => {
         return (
             baseline.code.toLowerCase().includes(searchText.toLowerCase()) ||

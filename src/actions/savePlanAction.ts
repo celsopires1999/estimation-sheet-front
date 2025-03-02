@@ -5,7 +5,7 @@ import { CreatePlan, UpdatePlan } from "@/models"
 import { savePlanSchema, SavePlanType } from "@/zod-schemas/plan"
 import { flattenValidationErrors } from "next-safe-action"
 import { cookies } from "next/headers"
-import { ValidationError, ValidationErrorCodes } from "./validation.error"
+import { errorHandling } from "./validation.error"
 
 export const savePlanAction = actionClient
     .metadata({ actionName: "savePlanAction" })
@@ -49,14 +49,7 @@ async function createPlan(input: SavePlanType) {
     })
 
     if (!response.ok) {
-        const e = await response.json()
-
-        if (ValidationErrorCodes.includes(response.status)) {
-            throw new ValidationError(e.message)
-        }
-
-        console.error(e)
-        throw new Error(e.error)
+        await errorHandling(response)
     }
 
     const data = await response.json()
@@ -104,14 +97,7 @@ async function updatePlan(input: SavePlanType) {
     )
 
     if (!response.ok) {
-        const e = await response.json()
-
-        if (ValidationErrorCodes.includes(response.status)) {
-            throw new ValidationError(e.message)
-        }
-
-        console.error(e)
-        throw new Error(e.error)
+        await errorHandling(response)
     }
 
     const data = await response.json()

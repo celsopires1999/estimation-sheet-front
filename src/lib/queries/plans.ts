@@ -1,6 +1,12 @@
 import "server-only"
 
-import { Plan, GetPlansBody } from "@/models"
+import {
+    Plan,
+    GetPlansBody,
+    PreliminaryPlanOption,
+    DefinitivePlanOption,
+    PlanType,
+} from "@/models"
 
 export async function getPlanSearchResults(
     searchText: string,
@@ -41,4 +47,27 @@ export async function getPlans(): Promise<Plan[]> {
     }
     const data: GetPlansBody = await response.json()
     return data.plans
+}
+
+export async function getPlanOptions() {
+    const plans = await getPlans()
+
+    const preliminary: PreliminaryPlanOption[] = plans
+        .filter(({ plan_type }) => plan_type === PlanType.Preliminary)
+        .map((plan) => ({
+            id: plan.plan_id,
+            description: plan.code,
+        }))
+
+    const definitive: DefinitivePlanOption[] = plans
+        .filter(({ plan_type }) => plan_type === PlanType.Definitive)
+        .map((plan) => ({
+            id: plan.plan_id,
+            description: plan.code,
+        }))
+
+    return {
+        preliminary,
+        definitive,
+    }
 }

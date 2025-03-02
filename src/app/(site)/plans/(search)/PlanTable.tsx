@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/table"
 import { toast } from "@/hooks/use-toast"
 import { useTableStateHelper } from "@/hooks/useTableStateHelper"
-import { Plan } from "@/models"
+import { getPlanTypeDescription, Plan } from "@/models"
 import {
     CellContext,
     createColumnHelper,
@@ -135,7 +135,7 @@ export function PlanTable({ data }: Props) {
         setPlanToDelete(null)
     }
 
-    const columnHeadersArray: Array<keyof Plan> = ["code", "name"]
+    const columnHeadersArray: Array<keyof Plan> = ["plan_type", "code", "name"]
 
     const columnDefs: Partial<{
         [K in keyof Plan]: {
@@ -146,6 +146,11 @@ export function PlanTable({ data }: Props) {
             presenter?: ({ value }: { value: unknown }) => JSX.Element
         }
     }> = {
+        plan_type: {
+            label: "Type",
+            filterable: true,
+            transform: (value) => getPlanTypeDescription(value),
+        },
         code: {
             label: "Code",
             filterable: true,

@@ -1,8 +1,8 @@
 export type Plan = {
     plan_id: string
+    plan_type: string
     code: string
     name: string
-    is_preview: boolean
     assumptions: Assumption[]
     created_at: Date
     updated_at: Date | null
@@ -27,4 +27,41 @@ export type UpdatePlan = Partial<
 
 export type GetPlansBody = {
     plans: Plan[]
+}
+
+export type PreliminaryPlanOption = {
+    id: string
+    description: string
+}
+
+export type DefinitivePlanOption = {
+    id: string
+    description: string
+}
+
+export const PlanType = {
+    Preliminary: "preliminary",
+    Definitive: "definitive",
+} as const
+
+export type PlanType = (typeof PlanType)[keyof typeof PlanType]
+
+export const PlanTypeOptions = Object.entries(PlanType).map(([key, value]) => ({
+    id: value,
+    description: key,
+}))
+
+export function getPlanTypeDescription(planType: string | unknown) {
+    let planTypeStr = ""
+
+    if (typeof planType !== "string") {
+        planTypeStr = String(planType)
+    } else {
+        planTypeStr = planType
+    }
+
+    const foundPlanType = PlanTypeOptions.find(
+        (c) => c.id === planTypeStr,
+    )?.description
+    return foundPlanType ?? ""
 }

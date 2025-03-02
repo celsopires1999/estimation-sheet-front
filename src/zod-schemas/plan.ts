@@ -3,7 +3,7 @@ import {
     isValidDecimalWithPrecision,
     isValidNumber,
 } from "@/lib/utils"
-import { Currency } from "@/models"
+import { Currency, PlanType } from "@/models"
 import { z } from "zod"
 
 export const saveCurrencyAssumptionSchema = z.object({
@@ -59,15 +59,17 @@ export const saveAssumptionSchema = z.object({
 
 export const savePlanSchema = z.object({
     plan_id: z.union([z.string().uuid("invalid Plan Id"), z.literal("(New)")]),
+    plan_type: z.nativeEnum(PlanType, {
+        errorMap: () => ({ message: "Invalid plan type" }),
+    }),
     code: z
         .string()
         .min(1, "Code is required")
-        .max(10, "Code max length is 10 characters"),
+        .max(15, "Code max length is 15 characters"),
     name: z
         .string()
         .min(1, "Name is required")
         .max(50, "Name max length is 50 characters"),
-    is_preview: z.boolean(),
     assumptions: z
         .array(saveAssumptionSchema)
         .min(1, "At least one assumption is required")

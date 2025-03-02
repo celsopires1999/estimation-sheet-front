@@ -30,6 +30,13 @@ export default async function BaselinesPage({
                         <li>Description</li>
                         <li>Manager</li>
                         <li>Solution Architect</li>
+                        <li>
+                            Enter{" "}
+                            <span className="font-bold">
+                                {"/ (slash character)"}
+                            </span>{" "}
+                            for all baselines
+                        </li>
                     </ul>
                 </div>
             </div>
