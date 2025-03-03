@@ -1,13 +1,13 @@
 import { BackButton } from "@/components/BackButton"
 import { getBaseline } from "@/lib/queries/baselines"
 import { getPlanOptions } from "@/lib/queries/plans"
-import { PreliminaryForm } from "./PreliminaryForm"
+import { PortfolioForm } from "./PortfolioForm"
+import { PlanType } from "@/models"
 
 export async function generateMetadata({
     params,
 }: {
     params: Promise<{ baselineId: string }>
-    searchParams: Promise<{ [key: string]: string | undefined }>
 }) {
     const { baselineId } = await params
 
@@ -17,17 +17,20 @@ export async function generateMetadata({
         }
     }
     return {
-        title: `New Preliminary for Baseline #${baselineId}`,
+        title: `New Portfolio for Baseline #${baselineId}`,
     }
 }
 
-export default async function PreliminaryFormPage({
+export default async function PortfolioFormPage({
     params,
+    searchParams,
 }: {
     params: Promise<{ baselineId: string }>
+    searchParams: Promise<{ [key: string]: string | undefined }>
 }) {
     try {
         const { baselineId } = await params
+        const { planType } = await searchParams
 
         if (!baselineId) {
             return (
@@ -53,13 +56,16 @@ export default async function PreliminaryFormPage({
             )
         }
 
-        const { preliminary } = await getPlanOptions()
+        const { preliminary, definitive } = await getPlanOptions()
 
         return (
-            <PreliminaryForm
-                key="new"
+            <PortfolioForm
+                key={baselineId}
                 baseline={baseline}
-                plans={preliminary}
+                plans={
+                    planType === PlanType.Definitive ? definitive : preliminary
+                }
+                planType={planType}
             />
         )
     } catch (error) {

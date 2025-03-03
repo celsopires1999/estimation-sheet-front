@@ -1,7 +1,10 @@
 "use client"
 import { deletePortfolioAction } from "@/actions/deletePortfolioAction"
+import { PlanBadge } from "@/app/(site)/plans/components/PlanBadge"
 import { AlertConfirmation } from "@/components/AlertConfirmation"
 import Deleting from "@/components/Deleting"
+import { FormatDateTime } from "@/components/FormatDateTime"
+import { FormatStartDate } from "@/components/FormatStartDate"
 import { Filter } from "@/components/react-table/Filter"
 import { NoFilter } from "@/components/react-table/NoFilter"
 import { Button } from "@/components/ui/button"
@@ -42,21 +45,22 @@ import {
     ArrowUp,
     MoreHorizontal,
     Plus,
+    PlusIcon,
     TableOfContents,
-    Trash,
+    TrashIcon,
 } from "lucide-react"
 import { useAction } from "next-safe-action/hooks"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { JSX, useEffect, useState } from "react"
-import { PreliminaryHeader } from "./components/PreliminaryHeader"
+import { PortfolioHeader } from "../../components/PortfolioHeader"
 
 type Props = {
     baseline: GetBaseline
     data: Portfolio[]
 }
 
-export function PreliminariesTable({ baseline, data }: Props) {
+export function PortfoliosTable({ baseline, data }: Props) {
     const router = useRouter()
 
     const searchParams = useSearchParams()
@@ -158,6 +162,7 @@ export function PreliminariesTable({ baseline, data }: Props) {
             width: 200,
             filterable: true,
             transform: (value) => getPlanTypeDescription(value),
+            presenter: ({ value }) => <PlanBadge planType={value} />,
         },
         plan_code: {
             label: "Plan",
@@ -168,14 +173,16 @@ export function PreliminariesTable({ baseline, data }: Props) {
             label: "Start Date",
             width: 200,
             filterable: false,
+            presenter: FormatStartDate,
         },
         created_at: {
             label: "Created At",
             width: 200,
             filterable: false,
+            presenter: FormatDateTime,
         },
         portfolio_id: {
-            label: "",
+            label: "Comment",
             width: 400,
             filterable: false,
             transform: () => "",
@@ -198,19 +205,30 @@ export function PreliminariesTable({ baseline, data }: Props) {
                     <DropdownMenuGroup>
                         <DropdownMenuItem asChild>
                             <Link
-                                href={`/baselines/${row.original.baseline_id}/preliminaries/form`}
+                                href={`/portfolios/baselines/${row.original.baseline_id}/form?planType=prelimitary`}
                                 className="flex w-full"
                                 prefetch={false}
                             >
-                                <Plus className="mr-2 h-4 w-4" />
-                                <span>Add</span>
+                                <PlusIcon className="mr-2 h-4 w-4" />
+                                <span>Preliminary</span>
+                            </Link>
+                        </DropdownMenuItem>
+
+                        <DropdownMenuItem asChild>
+                            <Link
+                                href={`/portfolios/baselines/${row.original.baseline_id}/form?planType=definitive`}
+                                className="flex w-full"
+                                prefetch={false}
+                            >
+                                <PlusIcon className="mr-2 h-4 w-4" />
+                                <span>Definitive</span>
                             </Link>
                         </DropdownMenuItem>
 
                         <DropdownMenuItem
                             onClick={() => handleDeletePortfolio(row.original)}
                         >
-                            <Trash className="mr-2 h-4 w-4" />
+                            <TrashIcon className="mr-2 h-4 w-4" />
                             <span>Delete</span>
                         </DropdownMenuItem>
                     </DropdownMenuGroup>
@@ -289,7 +307,7 @@ export function PreliminariesTable({ baseline, data }: Props) {
 
                         return (
                             <Link
-                                href={`/portfolios/${info.row.original.portfolio_id}`}
+                                href={`/portfolios/${info.row.original.portfolio_id}/view`}
                                 prefetch={false}
                             >
                                 {presenterFn ? (
@@ -343,7 +361,7 @@ export function PreliminariesTable({ baseline, data }: Props) {
 
     return (
         <div className="flex flex-col gap-1 sm:px-8">
-            <PreliminaryHeader title="Preliminary List" baseline={baseline}>
+            <PortfolioHeader title="Portfolio List" baseline={baseline}>
                 <div className="flex items-center space-x-2">
                     <Switch
                         id="filterToggle"
@@ -354,17 +372,17 @@ export function PreliminariesTable({ baseline, data }: Props) {
                         Filter
                     </Label>
                 </div>
-            </PreliminaryHeader>
+            </PortfolioHeader>
 
             {data.length === 0 && (
                 <div>
                     <Button variant="ghost" asChild>
                         <Link
-                            href={`/baselines/${baseline.baseline_id}/portfolios/form`}
+                            href={`/portfolios/baselines/${baseline.baseline_id}/form?planType=prelimitary`}
                             prefetch={false}
                         >
                             <Plus className="h-4 w-4" />
-                            <span>Add First Portfolio</span>
+                            <span>Add Preliminary</span>
                         </Link>
                     </Button>
                 </div>

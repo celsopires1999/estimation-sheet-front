@@ -10,21 +10,22 @@ import { LoaderCircle } from "lucide-react"
 import { useAction } from "next-safe-action/hooks"
 // import Link from "next/link"
 import { createPortfolioAction } from "@/actions/createPortfolioAction"
+import { PortfolioHeader } from "@/app/(site)/portfolios/components/PortfolioHeader"
 import { ComboboxWithLabel } from "@/components/inputs/ComboboxWithLabel"
-import { GetBaseline, PreliminaryPlanOption } from "@/models"
+import { GetBaseline, PlanOption } from "@/models"
 import {
     CreatePortfolioType,
     createPortfolioSchema,
 } from "@/zod-schemas/portfolio"
 import { useForm } from "react-hook-form"
-import { PreliminaryHeader } from "../components/PreliminaryHeader"
 
 type Props = {
     baseline: GetBaseline
-    plans: PreliminaryPlanOption[]
+    plans: PlanOption[]
+    planType?: string
 }
 
-export function PreliminaryForm({ baseline, plans }: Props) {
+export function PortfolioForm({ baseline, plans, planType }: Props) {
     const { toast } = useToast()
 
     const defaultValues: CreatePortfolioType = {
@@ -82,12 +83,11 @@ export function PreliminaryForm({ baseline, plans }: Props) {
     return (
         <div className="flex flex-col gap-1 sm:px-8">
             <DisplayServerActionResponse result={saveResult} />
-            <PreliminaryHeader
-                title="New Preliminary"
+            <PortfolioHeader
+                title="New Portfolio"
                 baseline={baseline}
-                children
+                planType={planType}
             />
-
             <Form {...form}>
                 <form
                     onSubmit={form.handleSubmit(submitForm)}
@@ -110,9 +110,6 @@ export function PreliminaryForm({ baseline, plans }: Props) {
                             max={999_999}
                             className="max-w-full"
                         />
-                    </div>
-
-                    <div className="flex w-full max-w-lg flex-col gap-4">
                         <div className="flex max-w-xs gap-2">
                             <Button
                                 type="submit"

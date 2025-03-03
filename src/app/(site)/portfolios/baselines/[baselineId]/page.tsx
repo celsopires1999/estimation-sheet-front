@@ -1,6 +1,6 @@
 import { getBaseline } from "@/lib/queries/baselines"
 import { getPortfoliosByBaselineId } from "@/lib/queries/portfolios"
-import { PreliminariesTable } from "./PreliminariesTable"
+import { PortfoliosTable } from "./PortfoliosTable"
 import { PlanType } from "@/models"
 
 export async function generateMetadata({
@@ -17,25 +17,34 @@ export async function generateMetadata({
     }
 
     return {
-        title: `Preliminaries for Baseline #${baselineId}`,
+        title: `Portfolios for Baseline #${baselineId}`,
     }
 }
 
-export default async function PortfoliosPage({
+export default async function PortfoliosByBaselinePage({
     params,
+    searchParams,
 }: {
     params: Promise<{ baselineId: string }>
+    searchParams: Promise<{ [key: string]: string | undefined }>
 }) {
     const { baselineId } = await params
+    const { planType } = await searchParams
+
+    const planTypeFilter = planType
+        ? planType === PlanType.Definitive
+            ? PlanType.Definitive
+            : PlanType.Preliminary
+        : PlanType.Preliminary
 
     try {
         const baseline = await getBaseline(baselineId)
         const portfolios = await getPortfoliosByBaselineId(baselineId)
-        const preliminaries = portfolios.filter(
-            ({ plan_type }) => plan_type === PlanType.Preliminary,
+        const filteredPortfolios = portfolios.filter(
+            ({ plan_type }) => plan_type === planTypeFilter,
         )
 
-        return <PreliminariesTable baseline={baseline} data={preliminaries} />
+        return <PortfoliosTable baseline={baseline} data={filteredPortfolios} />
     } catch (error) {
         if (error instanceof Error) {
             return <p className="mt-4">Error: ${error.message}</p>

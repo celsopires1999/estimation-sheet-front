@@ -46,8 +46,8 @@ export default async function PlansPage({
             <div>
                 <ListSearch
                     searchText={searchText}
-                    action="/users"
-                    placeholder="Search Users"
+                    action="/plans"
+                    placeholder="Search Plans"
                 />
                 {results.length ? (
                     <PlanTable data={results} />

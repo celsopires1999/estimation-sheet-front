@@ -29,12 +29,7 @@ export type GetPlansBody = {
     plans: Plan[]
 }
 
-export type PreliminaryPlanOption = {
-    id: string
-    description: string
-}
-
-export type DefinitivePlanOption = {
+export type PlanOption = {
     id: string
     description: string
 }

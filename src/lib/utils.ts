@@ -104,3 +104,15 @@ export function formatDecimal(
         maximumFractionDigits,
     }).format(+value)
 }
+
+export function formatInteger(value: number | string | unknown) {
+    if (typeof value !== "string" && typeof value !== "number") {
+        return ""
+    }
+
+    return new Intl.NumberFormat("pt-BR", {
+        style: "decimal",
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+    }).format(+value)
+}

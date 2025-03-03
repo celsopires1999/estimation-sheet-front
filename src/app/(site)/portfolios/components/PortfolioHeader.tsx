@@ -3,14 +3,21 @@ import { getMonthDescription } from "@/data"
 import { GetBaseline } from "@/models"
 import { ChevronRight } from "lucide-react"
 import Link from "next/link"
+import { PlanBadge } from "../../plans/components/PlanBadge"
 
 type Props = {
     title: string
-    baseline?: GetBaseline
+    baseline: GetBaseline
+    planType?: string
     children?: React.ReactNode
 }
 
-export function PreliminaryHeader({ title, baseline, children }: Props) {
+export function PortfolioHeader({
+    title,
+    baseline,
+    planType,
+    children,
+}: Props) {
     const month = baseline
         ? getMonthDescription(baseline?.start_date.substring(5, 7))
         : null
@@ -19,7 +26,10 @@ export function PreliminaryHeader({ title, baseline, children }: Props) {
     return (
         <>
             <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold">{title}</h2>
+                <div className="flex items-center gap-2">
+                    <h2 className="text-2xl font-bold">{title}</h2>
+                    <PlanBadge planType={planType} />
+                </div>
                 <div className="flex">
                     <Button variant="ghost" asChild>
                         <Link

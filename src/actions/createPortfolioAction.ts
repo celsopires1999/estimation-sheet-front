@@ -43,6 +43,11 @@ async function createPortfolio(input: CreatePortfolioType) {
         const e = await response.json()
 
         if (ValidationErrorCodes.includes(response.status)) {
+            if (e.message === "currency and year combination not found") {
+                throw new ValidationError(
+                    "Baseline duration, shift months and Plan assumptions must match",
+                )
+            }
             throw new ValidationError(e.message)
         }
 

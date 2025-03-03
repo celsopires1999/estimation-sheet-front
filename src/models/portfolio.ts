@@ -24,7 +24,7 @@ export type Portfolio = {
     duration: number
     manager: string
     estimator: string
-    start_date: Date
+    start_date: string
     created_at: Date
     updated_at: Date | null
 }

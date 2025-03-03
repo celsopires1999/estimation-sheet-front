@@ -43,13 +43,14 @@ import {
 import {
     ArrowDown,
     ArrowUp,
-    Edit,
+    EditIcon,
     FileIcon,
     HandshakeIcon,
+    ListIcon,
     MoreHorizontal,
-    Plus,
+    PlusIcon,
     TableOfContents,
-    Trash,
+    TrashIcon,
 } from "lucide-react"
 import { useAction } from "next-safe-action/hooks"
 import Link from "next/link"
@@ -198,7 +199,7 @@ export function BaselineTable({ data }: Props) {
                                     className="flex w-full"
                                     prefetch={false}
                                 >
-                                    <Plus className="mr-2 h-4 w-4" />
+                                    <PlusIcon className="mr-2 h-4 w-4" />
                                     <span>Add</span>
                                 </Link>
                             </DropdownMenuItem>
@@ -209,7 +210,7 @@ export function BaselineTable({ data }: Props) {
                                     className="flex w-full"
                                     prefetch={false}
                                 >
-                                    <Edit className="mr-2 h-4 w-4" />
+                                    <EditIcon className="mr-2 h-4 w-4" />
                                     <span>Edit</span>
                                 </Link>
                             </DropdownMenuItem>
@@ -219,7 +220,7 @@ export function BaselineTable({ data }: Props) {
                                     handleDeleteBaseline(row.original)
                                 }
                             >
-                                <Trash className="mr-2 h-4 w-4" />
+                                <TrashIcon className="mr-2 h-4 w-4" />
                                 <span>Delete</span>
                             </DropdownMenuItem>
                         </DropdownMenuSubContent>
@@ -240,7 +241,7 @@ export function BaselineTable({ data }: Props) {
                                     className="flex w-full"
                                     prefetch={false}
                                 >
-                                    <Plus className="mr-2 h-4 w-4" />
+                                    <PlusIcon className="mr-2 h-4 w-4" />
                                     <span>Add</span>
                                 </Link>
                             </DropdownMenuItem>
@@ -251,7 +252,7 @@ export function BaselineTable({ data }: Props) {
                                     className="flex w-full"
                                     prefetch={false}
                                 >
-                                    <Edit className="mr-2 h-4 w-4" />
+                                    <ListIcon className="mr-2 h-4 w-4" />
                                     <span>List</span>
                                 </Link>
                             </DropdownMenuItem>
@@ -273,7 +274,7 @@ export function BaselineTable({ data }: Props) {
                                     className="flex w-full"
                                     prefetch={false}
                                 >
-                                    <Plus className="mr-2 h-4 w-4" />
+                                    <PlusIcon className="mr-2 h-4 w-4" />
                                     <span>Add</span>
                                 </Link>
                             </DropdownMenuItem>
@@ -284,7 +285,7 @@ export function BaselineTable({ data }: Props) {
                                     className="flex w-full"
                                     prefetch={false}
                                 >
-                                    <Edit className="mr-2 h-4 w-4" />
+                                    <ListIcon className="mr-2 h-4 w-4" />
                                     <span>List</span>
                                 </Link>
                             </DropdownMenuItem>
@@ -295,29 +296,29 @@ export function BaselineTable({ data }: Props) {
                 <DropdownMenuSub>
                     <DropdownMenuSubTrigger>
                         <FileIcon className="mr-2 h-4 w-4" />
-                        <span>Preliminary</span>
+                        <span>Portfolio</span>
                     </DropdownMenuSubTrigger>
 
                     <DropdownMenuPortal>
                         <DropdownMenuSubContent>
                             <DropdownMenuItem asChild>
                                 <Link
-                                    href={`/baselines/${row.original.baseline_id}/preliminaries/form`}
+                                    href={`/portfolios/baselines/${row.original.baseline_id}/form?planType=preliminary`}
                                     className="flex w-full"
                                     prefetch={false}
                                 >
-                                    <Plus className="mr-2 h-4 w-4" />
+                                    <PlusIcon className="mr-2 h-4 w-4" />
                                     <span>Add</span>
                                 </Link>
                             </DropdownMenuItem>
 
                             <DropdownMenuItem asChild>
                                 <Link
-                                    href={`/baselines/${row.original.baseline_id}/preliminaries`}
+                                    href={`portfolios/baselines/${row.original.baseline_id}`}
                                     className="flex w-full"
                                     prefetch={false}
                                 >
-                                    <Edit className="mr-2 h-4 w-4" />
+                                    <ListIcon className="mr-2 h-4 w-4" />
                                     <span>List</span>
                                 </Link>
                             </DropdownMenuItem>

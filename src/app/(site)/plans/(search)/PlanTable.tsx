@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/table"
 import { toast } from "@/hooks/use-toast"
 import { useTableStateHelper } from "@/hooks/useTableStateHelper"
-import { getPlanTypeDescription, Plan } from "@/models"
+import { Plan } from "@/models"
 import {
     CellContext,
     createColumnHelper,
@@ -45,12 +45,13 @@ import {
     MoreHorizontal,
     PlusIcon,
     TableOfContents,
-    Trash,
+    TrashIcon,
 } from "lucide-react"
 import { useAction } from "next-safe-action/hooks"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { JSX, useEffect, useState } from "react"
+import { PlanBadge } from "../components/PlanBadge"
 
 type Props = {
     data: Plan[]
@@ -149,7 +150,7 @@ export function PlanTable({ data }: Props) {
         plan_type: {
             label: "Type",
             filterable: true,
-            transform: (value) => getPlanTypeDescription(value),
+            presenter: ({ value }) => <PlanBadge planType={value} />,
         },
         code: {
             label: "Code",
@@ -211,7 +212,7 @@ export function PlanTable({ data }: Props) {
                         <DropdownMenuItem
                             onClick={() => handleDeletePlan(row.original)}
                         >
-                            <Trash className="mr-2 h-4 w-4" />
+                            <TrashIcon className="mr-2 h-4 w-4" />
                             <span>Delete</span>
                         </DropdownMenuItem>
                     </DropdownMenuGroup>
@@ -343,7 +344,7 @@ export function PlanTable({ data }: Props) {
     return (
         <div className="mt-6 flex max-w-screen-lg flex-col gap-4">
             <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold">Users List</h2>
+                <h2 className="text-2xl font-bold">Plan List</h2>
                 <div className="flex items-center space-x-2">
                     <Switch
                         id="filterToggle"

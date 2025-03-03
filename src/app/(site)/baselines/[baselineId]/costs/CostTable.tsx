@@ -2,6 +2,7 @@
 import { deleteCostAction } from "@/actions/deleteCostAction"
 import { AlertConfirmation } from "@/components/AlertConfirmation"
 import Deleting from "@/components/Deleting"
+import { FormatDecimal } from "@/components/FormatDecimal"
 import { Filter } from "@/components/react-table/Filter"
 import { NoFilter } from "@/components/react-table/NoFilter"
 import { Button } from "@/components/ui/button"
@@ -45,18 +46,18 @@ import {
 import {
     ArrowDown,
     ArrowUp,
-    Edit,
+    EditIcon,
     MoreHorizontal,
     Plus,
+    PlusIcon,
     TableOfContents,
-    Trash,
+    TrashIcon,
 } from "lucide-react"
 import { useAction } from "next-safe-action/hooks"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { JSX, useEffect, useState } from "react"
 import { CostHeader } from "./components/CostHeader"
-import { FormatDecimal } from "./components/FormatDecimal"
 import { Inflation } from "./components/Inflation"
 
 type Props = {
@@ -210,7 +211,7 @@ export function CostTable({ baseline, data }: Props) {
                                 className="flex w-full"
                                 prefetch={false}
                             >
-                                <Plus className="mr-2 h-4 w-4" />
+                                <PlusIcon className="mr-2 h-4 w-4" />
                                 <span>Add</span>
                             </Link>
                         </DropdownMenuItem>
@@ -221,7 +222,7 @@ export function CostTable({ baseline, data }: Props) {
                                 className="flex w-full"
                                 prefetch={false}
                             >
-                                <Edit className="mr-2 h-4 w-4" />
+                                <EditIcon className="mr-2 h-4 w-4" />
                                 <span>Edit</span>
                             </Link>
                         </DropdownMenuItem>
@@ -229,7 +230,7 @@ export function CostTable({ baseline, data }: Props) {
                         <DropdownMenuItem
                             onClick={() => handleDeleteCost(row.original)}
                         >
-                            <Trash className="mr-2 h-4 w-4" />
+                            <TrashIcon className="mr-2 h-4 w-4" />
                             <span>Delete</span>
                         </DropdownMenuItem>
                     </DropdownMenuGroup>

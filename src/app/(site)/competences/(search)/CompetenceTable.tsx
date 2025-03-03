@@ -40,11 +40,11 @@ import {
 import {
     ArrowDown,
     ArrowUp,
-    Edit,
+    EditIcon,
     MoreHorizontal,
-    Plus,
+    PlusIcon,
     TableOfContents,
-    Trash,
+    TrashIcon,
 } from "lucide-react"
 import { useAction } from "next-safe-action/hooks"
 import Link from "next/link"
@@ -170,7 +170,7 @@ export function CompetenceTable({ data }: Props) {
                                 className="flex w-full"
                                 prefetch={false}
                             >
-                                <Plus className="mr-2 h-4 w-4" />
+                                <PlusIcon className="mr-2 h-4 w-4" />
                                 <span>Add</span>
                             </Link>
                         </DropdownMenuItem>
@@ -181,7 +181,7 @@ export function CompetenceTable({ data }: Props) {
                                 className="flex w-full"
                                 prefetch={false}
                             >
-                                <Edit className="mr-2 h-4 w-4" />
+                                <EditIcon className="mr-2 h-4 w-4" />
                                 <span>Edit</span>
                             </Link>
                         </DropdownMenuItem>
@@ -189,7 +189,7 @@ export function CompetenceTable({ data }: Props) {
                         <DropdownMenuItem
                             onClick={() => handleDeleteCompetence(row.original)}
                         >
-                            <Trash className="mr-2 h-4 w-4" />
+                            <TrashIcon className="mr-2 h-4 w-4" />
                             <span>Delete</span>
                         </DropdownMenuItem>
                     </DropdownMenuGroup>

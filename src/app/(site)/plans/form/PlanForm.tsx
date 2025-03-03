@@ -2,8 +2,8 @@
 
 import { savePlanAction } from "@/actions/savePlanAction"
 import { DisplayServerActionResponse } from "@/components/DisplayServerActionResponse"
-import { CheckboxWithLabel } from "@/components/inputs/CheckboxWithLabel"
 import { InputWithLabel } from "@/components/inputs/InputWithLabel"
+import { SelectWithLabel } from "@/components/inputs/SelectWithLabel"
 import { Button } from "@/components/ui/button"
 import { Form } from "@/components/ui/form"
 import { useToast } from "@/hooks/use-toast"
@@ -14,7 +14,6 @@ import { LoaderCircle } from "lucide-react"
 import { useAction } from "next-safe-action/hooks"
 import { useForm } from "react-hook-form"
 import { Assumptions } from "./Assumptions"
-import { SelectWithLabel } from "@/components/inputs/SelectWithLabel"
 
 type Props = {
     plan?: Plan
