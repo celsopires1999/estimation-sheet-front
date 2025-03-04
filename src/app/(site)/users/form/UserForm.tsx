@@ -82,7 +82,7 @@ export function UserForm({ user }: Props) {
             <DisplayServerActionResponse result={saveResult} />
             <div className="flex items-center justify-between">
                 <h2 className="text-2xl font-bold">
-                    {user?.user_id ? "Edit" : "New"} Competence
+                    {user?.user_id ? "Edit" : "New"} User
                 </h2>
             </div>
 

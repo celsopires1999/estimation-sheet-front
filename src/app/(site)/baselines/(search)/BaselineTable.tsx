@@ -303,17 +303,6 @@ export function BaselineTable({ data }: Props) {
                         <DropdownMenuSubContent>
                             <DropdownMenuItem asChild>
                                 <Link
-                                    href={`/portfolios/baselines/${row.original.baseline_id}/form?planType=preliminary`}
-                                    className="flex w-full"
-                                    prefetch={false}
-                                >
-                                    <PlusIcon className="mr-2 h-4 w-4" />
-                                    <span>Add</span>
-                                </Link>
-                            </DropdownMenuItem>
-
-                            <DropdownMenuItem asChild>
-                                <Link
                                     href={`portfolios/baselines/${row.original.baseline_id}`}
                                     className="flex w-full"
                                     prefetch={false}

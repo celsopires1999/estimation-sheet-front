@@ -136,7 +136,7 @@ export function BaselineForm({
                     className="flex flex-col gap-4 md:flex-row md:gap-8"
                 >
                     <div className="flex w-full max-w-lg flex-col gap-4">
-                        <div className="flex items-center justify-between gap-4">
+                        <div className="flex items-start justify-between gap-4">
                             <div className="w-2/3">
                                 <InputWithLabel<SaveBaselineType>
                                     fieldTitle="Code"
@@ -169,7 +169,7 @@ export function BaselineForm({
                     </div>
 
                     <div className="flex w-full max-w-lg flex-col gap-4">
-                        <div className="flex items-center justify-between gap-4">
+                        <div className="flex items-start justify-between gap-4">
                             <div className="w-1/2">
                                 <ComboboxWithLabel<SaveBaselineType>
                                     fieldTitle="Start Year"

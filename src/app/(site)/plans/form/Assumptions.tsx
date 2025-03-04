@@ -33,7 +33,7 @@ export function Assumptions() {
 
     const handleAddAssumption = () => {
         const lastIndex = fields.length - 1
-        const assumptions = fields as unknown as SaveAssumptionType[]
+        const assumptions = form.getValues().assumptions
 
         append({
             year: (+assumptions[lastIndex].year + 1).toString(),
