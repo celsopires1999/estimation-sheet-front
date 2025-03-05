@@ -59,6 +59,17 @@ export function PortfolioViewForm({ portfolio }: Props) {
                             <ChevronRight className="h-4 w-4" />
                         </Link>
                     </Button>
+
+                    <Button variant="ghost" asChild>
+                        <Link
+                            href={`/portfolios/baselines/${portfolio.baseline_id}`}
+                            className="flex w-full"
+                            prefetch={false}
+                        >
+                            <span>Portfolios</span>{" "}
+                            <ChevronRight className="h-4 w-4" />
+                        </Link>
+                    </Button>
                 </div>
             </div>
             <div className="mb-6 space-y-2">

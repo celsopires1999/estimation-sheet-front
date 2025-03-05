@@ -9,6 +9,7 @@ import {
 import { flattenValidationErrors } from "next-safe-action"
 import { cookies } from "next/headers"
 import { ValidationError, ValidationErrorCodes } from "./validation.error"
+import { getBaseline } from "@/lib/queries/baselines"
 
 export const createPortfolioAction = actionClient
     .metadata({ actionName: "createPortfolioAction" })
@@ -27,8 +28,27 @@ export const createPortfolioAction = actionClient
     )
 
 async function createPortfolio(input: CreatePortfolioType) {
-    const user: CreatePortfolioCommand = {
-        ...input,
+    const baseline = await getBaseline(input.baseline_id)
+
+    const baselineStartYear = +baseline.start_date.substring(0, 4)
+    const baselineStartMonth = +baseline.start_date.substring(5, 7)
+    const portfolioStartYear = +input.start_year
+    const portfolioStartMonth = +input.start_month
+
+    const diffInMonths =
+        (portfolioStartYear - baselineStartYear) * 12 +
+        (portfolioStartMonth - baselineStartMonth)
+
+    if (diffInMonths < 0) {
+        throw new ValidationError(
+            "Portfolio start date must be greater than baseline start date",
+        )
+    }
+
+    const params: CreatePortfolioCommand = {
+        baseline_id: input.baseline_id,
+        plan_id: input.plan_id,
+        shift_months: diffInMonths,
     }
 
     const response = await fetch(`${process.env.NEXT_API_URL}/portfolios`, {
@@ -36,7 +56,7 @@ async function createPortfolio(input: CreatePortfolioType) {
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify(user),
+        body: JSON.stringify(params),
     })
 
     if (!response.ok) {

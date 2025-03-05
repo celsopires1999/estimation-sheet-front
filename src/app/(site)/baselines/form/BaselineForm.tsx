@@ -126,6 +126,17 @@ export function BaselineForm({
                                 <ChevronRight className="h-4 w-4" />
                             </Link>
                         </Button>
+
+                        <Button variant="ghost" asChild>
+                            <Link
+                                href={`/portfolios/baselines/${baselineId}`}
+                                className="flex w-full"
+                                prefetch={false}
+                            >
+                                <span>Portfolios</span>{" "}
+                                <ChevronRight className="h-4 w-4" />
+                            </Link>
+                        </Button>
                     </div>
                 )}
             </div>
