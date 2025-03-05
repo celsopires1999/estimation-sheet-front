@@ -1,14 +1,14 @@
 import { BadgeWithTooltip } from "@/components/BadgeWithTooltip"
 import { getPlanTypeDescription, PlanType } from "@/models"
 
-export function PlanBadge({ planType }: { planType: string | unknown }) {
-    if (typeof planType !== "string") {
-        return null
+export function PlanBadge({ value }: { value: unknown }) {
+    if (typeof value !== "string") {
+        return <span>undefined</span>
     }
 
     return (
         <>
-            {planType === PlanType.Definitive ? (
+            {value.toLowerCase() === PlanType.Definitive ? (
                 <BadgeWithTooltip
                     variant="default"
                     text="Portfolio can be used for planning"

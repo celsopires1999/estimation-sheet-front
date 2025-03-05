@@ -28,7 +28,7 @@ export function PortfolioHeader({
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                     <h2 className="text-2xl font-bold">{title}</h2>
-                    <PlanBadge planType={planType} />
+                    <PlanBadge value={planType} />
                 </div>
                 <div className="flex">
                     <Button variant="ghost" asChild>

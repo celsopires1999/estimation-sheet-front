@@ -62,6 +62,12 @@ export type BudgetYearly = {
     amount: number
 }
 
+export type BudgetTypeYearly = {
+    year: number
+    cost_type: string
+    amount: number
+}
+
 export type Workload = {
     workload_id: string
     portfolio_id: string

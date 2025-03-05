@@ -162,7 +162,7 @@ export function PortfoliosTable({ baseline, data }: Props) {
             width: 200,
             filterable: true,
             transform: (value) => getPlanTypeDescription(value),
-            presenter: ({ value }) => <PlanBadge planType={value} />,
+            presenter: PlanBadge,
         },
         plan_code: {
             label: "Plan",

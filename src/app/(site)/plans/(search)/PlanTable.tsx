@@ -150,7 +150,7 @@ export function PlanTable({ data }: Props) {
         plan_type: {
             label: "Type",
             filterable: true,
-            presenter: ({ value }) => <PlanBadge planType={value} />,
+            presenter: PlanBadge,
         },
         code: {
             label: "Code",

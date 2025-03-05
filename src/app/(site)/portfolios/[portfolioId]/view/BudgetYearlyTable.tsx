@@ -9,7 +9,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { BudgetYearly } from "@/models"
+import { BudgetTypeYearly, getCostTypeDescription } from "@/models"
 import {
     createColumnHelper,
     flexRender,
@@ -19,15 +19,19 @@ import {
 import { JSX } from "react"
 
 type Props = {
-    data: BudgetYearly[]
+    data: BudgetTypeYearly[]
     total: number
 }
 
 export function BudgetYearlyTable({ data, total }: Props) {
-    const columnHeadersArray: Array<keyof BudgetYearly> = ["year", "amount"]
+    const columnHeadersArray: Array<keyof BudgetTypeYearly> = [
+        "year",
+        "cost_type",
+        "amount",
+    ]
 
     const columnDefs: Partial<{
-        [K in keyof BudgetYearly]: {
+        [K in keyof BudgetTypeYearly]: {
             label: string
             width?: number
             headerRight?: boolean
@@ -36,6 +40,11 @@ export function BudgetYearlyTable({ data, total }: Props) {
         }
     }> = {
         year: { label: "Year", width: 150 },
+        cost_type: {
+            label: "Type",
+            width: 50,
+            transform: getCostTypeDescription,
+        },
         amount: {
             label: "Amount (BRL)",
             width: 150,
@@ -44,7 +53,7 @@ export function BudgetYearlyTable({ data, total }: Props) {
         },
     }
 
-    const columnHelper = createColumnHelper<BudgetYearly>()
+    const columnHelper = createColumnHelper<BudgetTypeYearly>()
 
     const columns = columnHeadersArray.map((columnName) => {
         return columnHelper.accessor(
@@ -164,7 +173,7 @@ export function BudgetYearlyTable({ data, total }: Props) {
                     </TableBody>
                     <TableFooter>
                         <TableRow>
-                            <TableCell colSpan={1}>Grand Total</TableCell>
+                            <TableCell colSpan={2}>Grand Total</TableCell>
                             <TableCell>
                                 <FormatDecimal value={total} />
                             </TableCell>

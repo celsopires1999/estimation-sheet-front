@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { getMonthDescription } from "@/data"
-import { BudgetYearly, GetPortfolioWithItems } from "@/models"
+import { BudgetTypeYearly, GetPortfolioWithItems } from "@/models"
 import { ChevronRight } from "lucide-react"
 import Link from "next/link"
 import { BudgetTable } from "./BudgetTable"
@@ -65,7 +65,7 @@ export function PortfolioViewForm({ portfolio }: Props) {
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
                         <h3>{portfolio.plan_code}</h3>
-                        <PlanBadge planType={portfolio.plan_type} />
+                        <PlanBadge value={portfolio.plan_type} />
                     </div>
                     <h3>{`${portfolio.estimator} & ${portfolio.manager}`}</h3>
                 </div>
@@ -164,35 +164,58 @@ function calculateWorkloadYearly(
     return result
 }
 
-function calculateBudgetYearly(budgets: GetPortfolioWithItems["budgets"]) {
-    if (!budgets) {
-        return []
-    }
-
-    const flatBudgets = budgets.flatMap((budget) => budget.budget_yearly)
-
-    const mapBudgets = flatBudgets.reduce(
-        (result, item) => {
-            const year = item.year
-            if (!result[year]) {
-                result[year] = []
-            }
-            result[year].push(item)
-            return result
-        },
-        {} as { [year: number]: BudgetYearly[] },
-    )
-
-    return Object.entries(mapBudgets).map(([year, items]) => ({
-        year: Number(year),
-        amount: items.reduce((total, item) => total + item.amount, 0),
-    }))
-}
-
 function calculateTotalBudget(budgets: GetPortfolioWithItems["budgets"]) {
     if (!budgets) {
         return 0
     }
 
     return budgets.reduce((total, budget) => total + budget.amount, 0)
+}
+
+function calculateBudgetYearly(
+    budgets: GetPortfolioWithItems["budgets"],
+): BudgetTypeYearly[] {
+    if (!budgets) {
+        return []
+    }
+
+    const yearCostTypeMap: Map<string, number> = new Map<string, number>()
+
+    budgets.forEach((budget) => {
+        budget.budget_yearly.forEach((y) => {
+            let value = yearCostTypeMap.get(
+                y.year.toString() + "\n" + budget.cost_type,
+            )
+
+            if (value) {
+                value += y.amount
+                yearCostTypeMap.set(
+                    y.year.toString() + "\n" + budget.cost_type,
+                    value,
+                )
+            } else {
+                yearCostTypeMap.set(
+                    y.year.toString() + "\n" + budget.cost_type,
+                    y.amount,
+                )
+            }
+        })
+    })
+
+    const result = Array.from(yearCostTypeMap).map(([key, value]) => {
+        const year = key.split("\n")[0]
+        const cost_type = key.split("\n")[1]
+        return {
+            year: +year,
+            cost_type,
+            amount: value,
+        }
+    })
+
+    return result.sort((a, b) => {
+        if (a.year === b.year) {
+            return a.cost_type.localeCompare(b.cost_type)
+        }
+        return a.year - b.year
+    })
 }
