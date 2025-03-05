@@ -3,7 +3,7 @@ import { getPlanTypeDescription, PlanType } from "@/models"
 
 export function PlanBadge({ value }: { value: unknown }) {
     if (typeof value !== "string") {
-        return <span>undefined</span>
+        return <span></span>
     }
 
     return (

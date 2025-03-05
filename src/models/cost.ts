@@ -35,6 +35,7 @@ export const CostType = {
     OTC: "one_time",
     RC: "running",
     INV: "investment",
+    NTI: "non_tech",
 } as const
 
 export type CostType = (typeof CostType)[keyof typeof CostType]
