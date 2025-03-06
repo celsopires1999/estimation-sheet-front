@@ -7,7 +7,7 @@ import { CostType, CreateCost, UpdateCost } from "@/models"
 import { saveCostSchema, SaveCostType } from "@/zod-schemas/cost"
 import { flattenValidationErrors } from "next-safe-action"
 import { cookies } from "next/headers"
-import { ValidationError, ValidationErrorCodes } from "./validation.error"
+import { errorHandling, ValidationError } from "./validation.error"
 
 export const saveCostAction = actionClient
     .metadata({ actionName: "saveCostAction" })
@@ -63,14 +63,7 @@ async function createCost(input: SaveCostType) {
     )
 
     if (!response.ok) {
-        const e = await response.json()
-
-        if (ValidationErrorCodes.includes(response.status)) {
-            throw new ValidationError(e.message)
-        }
-
-        console.error(e)
-        throw new Error(e.error)
+        await errorHandling(response)
     }
 
     const data = await response.json()
@@ -126,14 +119,7 @@ async function updateCost(input: SaveCostType) {
     )
 
     if (!response.ok) {
-        const e = await response.json()
-
-        if (ValidationErrorCodes.includes(response.status)) {
-            throw new ValidationError(e.message)
-        }
-
-        console.error(e)
-        throw new Error(e.error)
+        await errorHandling(response)
     }
 
     const data = await response.json()

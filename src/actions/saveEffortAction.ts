@@ -7,7 +7,7 @@ import { CreateEffort, UpdateEffort } from "@/models"
 import { saveEffortSchema, SaveEffortType } from "@/zod-schemas/effort"
 import { flattenValidationErrors } from "next-safe-action"
 import { cookies } from "next/headers"
-import { ValidationError, ValidationErrorCodes } from "./validation.error"
+import { errorHandling, ValidationError } from "./validation.error"
 
 export const saveEffortAction = actionClient
     .metadata({ actionName: "saveEffortAction" })
@@ -61,14 +61,7 @@ async function createEffort(input: SaveEffortType) {
     )
 
     if (!response.ok) {
-        const e = await response.json()
-
-        if (ValidationErrorCodes.includes(response.status)) {
-            throw new ValidationError(e.message)
-        }
-
-        console.error(e)
-        throw new Error(e.error)
+        await errorHandling(response)
     }
 
     const data = await response.json()
@@ -121,16 +114,8 @@ async function updateEffort(input: SaveEffortType) {
     )
 
     if (!response.ok) {
-        const e = await response.json()
-
-        if (ValidationErrorCodes.includes(response.status)) {
-            throw new ValidationError(e.message)
-        }
-
-        console.error(e)
-        throw new Error(e.error)
+        await errorHandling(response)
     }
-
     const data = await response.json()
 
     const { effort_id }: { effort_id: string } = data

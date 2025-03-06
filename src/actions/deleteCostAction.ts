@@ -4,7 +4,7 @@ import { actionClient } from "@/lib/safe-action"
 import { flattenValidationErrors } from "next-safe-action"
 import { cookies } from "next/headers"
 import { z } from "zod"
-import { ValidationError, ValidationErrorCodes } from "./validation.error"
+import { errorHandling } from "./validation.error"
 
 const deleteCostSchema = z.object({
     costId: z.string().uuid("invalid cost ID"),
@@ -35,14 +35,7 @@ export const deleteCostAction = actionClient
             )
 
             if (!response.ok) {
-                const e = await response.json()
-
-                if (ValidationErrorCodes.includes(response.status)) {
-                    throw new ValidationError(e.message)
-                }
-
-                console.error(e)
-                throw new Error(e.error)
+                await errorHandling(response)
             }
 
             // force client to refresh the page

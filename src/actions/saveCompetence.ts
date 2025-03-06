@@ -8,7 +8,7 @@ import {
 } from "@/zod-schemas/competence"
 import { flattenValidationErrors } from "next-safe-action"
 import { cookies } from "next/headers"
-import { ValidationError, ValidationErrorCodes } from "./validation.error"
+import { errorHandling } from "./validation.error"
 
 export const saveCompetenceAction = actionClient
     .metadata({ actionName: "saveCompetenceAction" })
@@ -45,16 +45,8 @@ async function createCompetence(input: SaveCompetenceType) {
     })
 
     if (!response.ok) {
-        const e = await response.json()
-
-        if (ValidationErrorCodes.includes(response.status)) {
-            throw new ValidationError(e.message)
-        }
-
-        console.error(e)
-        throw new Error(e.error)
+        await errorHandling(response)
     }
-
     const data = await response.json()
 
     const { competence_id }: { competence_id: string } = data
@@ -86,16 +78,8 @@ async function updateCompetence(input: SaveCompetenceType) {
         },
     )
     if (!response.ok) {
-        const e = await response.json()
-
-        if (ValidationErrorCodes.includes(response.status)) {
-            throw new ValidationError(e.message)
-        }
-
-        console.error(e)
-        throw new Error(e.error)
+        await errorHandling(response)
     }
-
     const data = await response.json()
 
     const { competence_id }: { competence_id: string } = data

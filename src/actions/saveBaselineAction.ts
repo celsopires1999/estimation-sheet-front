@@ -5,7 +5,7 @@ import { CreateBaseline, UpdateBaseline } from "@/models"
 import { saveBaselineSchema, SaveBaselineType } from "@/zod-schemas/baseline"
 import { flattenValidationErrors } from "next-safe-action"
 import { cookies } from "next/headers"
-import { ValidationError, ValidationErrorCodes } from "./validation.error"
+import { errorHandling } from "./validation.error"
 
 export const saveBaselineAction = actionClient
     .metadata({ actionName: "saveBaselineAction" })
@@ -49,14 +49,7 @@ async function createBaseline(input: SaveBaselineType) {
     })
 
     if (!response.ok) {
-        const e = await response.json()
-
-        if (ValidationErrorCodes.includes(response.status)) {
-            throw new ValidationError(e.message)
-        }
-
-        console.error(e)
-        throw new Error(e.error)
+        await errorHandling(response)
     }
 
     const data = await response.json()
@@ -97,16 +90,8 @@ async function updateBaseline(input: SaveBaselineType) {
         },
     )
     if (!response.ok) {
-        const e = await response.json()
-
-        if (ValidationErrorCodes.includes(response.status)) {
-            throw new ValidationError(e.message)
-        }
-
-        console.error(e)
-        throw new Error(e.error)
+        await errorHandling(response)
     }
-
     const data = await response.json()
 
     const { baseline_id }: { baseline_id: string } = data

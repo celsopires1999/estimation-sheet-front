@@ -5,7 +5,7 @@ import { CreateUser, UpdateUser } from "@/models"
 import { saveUserSchema, SaveUserType } from "@/zod-schemas/user"
 import { flattenValidationErrors } from "next-safe-action"
 import { cookies } from "next/headers"
-import { ValidationError, ValidationErrorCodes } from "./validation.error"
+import { errorHandling } from "./validation.error"
 
 export const saveUserAction = actionClient
     .metadata({ actionName: "saveUserAction" })
@@ -38,14 +38,7 @@ async function createUser(input: SaveUserType) {
     })
 
     if (!response.ok) {
-        const e = await response.json()
-
-        if (ValidationErrorCodes.includes(response.status)) {
-            throw new ValidationError(e.message)
-        }
-
-        console.error(e)
-        throw new Error(e.error)
+        await errorHandling(response)
     }
 
     const data = await response.json()
@@ -81,14 +74,7 @@ async function updateUser(input: SaveUserType) {
         },
     )
     if (!response.ok) {
-        const e = await response.json()
-
-        if (ValidationErrorCodes.includes(response.status)) {
-            throw new ValidationError(e.message)
-        }
-
-        console.error(e)
-        throw new Error(e.error)
+        await errorHandling(response)
     }
 
     const data = await response.json()
