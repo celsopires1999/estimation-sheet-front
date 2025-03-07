@@ -1,6 +1,7 @@
 "use client"
 
 import { saveBaselineAction } from "@/actions/saveBaselineAction"
+import { BaselineNav } from "@/components/BaselineNav"
 import { DisplayServerActionResponse } from "@/components/DisplayServerActionResponse"
 import { ComboboxWithLabel } from "@/components/inputs/ComboboxWithLabel"
 import { InputWithLabel } from "@/components/inputs/InputWithLabel"
@@ -11,9 +12,8 @@ import { useToast } from "@/hooks/use-toast"
 import { GetBaseline, ManagerOption, SolutionArchitectOption } from "@/models"
 import { saveBaselineSchema, SaveBaselineType } from "@/zod-schemas/baseline"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { ChevronRight, LoaderCircle } from "lucide-react"
+import { LoaderCircle } from "lucide-react"
 import { useAction } from "next-safe-action/hooks"
-import Link from "next/link"
 import { useForm } from "react-hook-form"
 
 type Props = {
@@ -104,40 +104,7 @@ export function BaselineForm({
                     {baseline?.baseline_id ? "Edit" : "New"} Baseline
                 </h2>
                 {baselineId && (
-                    <div className="flex">
-                        <Button variant="ghost" asChild>
-                            <Link
-                                href={`/baselines/${baselineId}/costs`}
-                                className="flex w-full"
-                                prefetch={false}
-                            >
-                                <span>Costs</span>{" "}
-                                <ChevronRight className="h-4 w-4" />
-                            </Link>
-                        </Button>
-
-                        <Button variant="ghost" asChild>
-                            <Link
-                                href={`/baselines/${baselineId}/efforts`}
-                                className="flex w-full"
-                                prefetch={false}
-                            >
-                                <span>Efforts</span>{" "}
-                                <ChevronRight className="h-4 w-4" />
-                            </Link>
-                        </Button>
-
-                        <Button variant="ghost" asChild>
-                            <Link
-                                href={`/portfolios/baselines/${baselineId}`}
-                                className="flex w-full"
-                                prefetch={false}
-                            >
-                                <span>Portfolios</span>{" "}
-                                <ChevronRight className="h-4 w-4" />
-                            </Link>
-                        </Button>
-                    </div>
+                    <BaselineNav baselineId={baselineId} omit="baseline" />
                 )}
             </div>
 

@@ -1,5 +1,6 @@
 "use server"
 
+import { getBaseline } from "@/lib/queries/baselines"
 import { actionClient } from "@/lib/safe-action"
 import { CreatePortfolioCommand } from "@/models/portfolio"
 import {
@@ -9,7 +10,6 @@ import {
 import { flattenValidationErrors } from "next-safe-action"
 import { cookies } from "next/headers"
 import { ValidationError, ValidationErrorCodes } from "./validation.error"
-import { getBaseline } from "@/lib/queries/baselines"
 
 export const createPortfolioAction = actionClient
     .metadata({ actionName: "createPortfolioAction" })
@@ -45,6 +45,12 @@ async function createPortfolio(input: CreatePortfolioType) {
         )
     }
 
+    if (diffInMonths > 36) {
+        throw new ValidationError(
+            "Time span between Baseline and Portfolio must be less than or equal to 36 months",
+        )
+    }
+
     const params: CreatePortfolioCommand = {
         baseline_id: input.baseline_id,
         plan_id: input.plan_id,
@@ -63,11 +69,25 @@ async function createPortfolio(input: CreatePortfolioType) {
         const e = await response.json()
 
         if (ValidationErrorCodes.includes(response.status)) {
-            if (e.message === "currency and year combination not found") {
-                throw new ValidationError(
-                    "Baseline duration, shift months and Plan assumptions must match",
-                )
+            if (typeof e.message === "string") {
+                switch (true) {
+                    case /currency and year combination not found/.test(
+                        e.message,
+                    ):
+                        throw new ValidationError(
+                            "The Plan does not support the Baseline duration with the selected Start Year and Start Month",
+                        )
+                    case /portfolio for plan id.*baseline code.*already exists/.test(
+                        e.message,
+                    ):
+                        throw new ValidationError(
+                            "There is a Portfolio for the Baseline and Plan combination already",
+                        )
+                    default:
+                        break
+                }
             }
+
             throw new ValidationError(e.message)
         }
 

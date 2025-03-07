@@ -1,11 +1,9 @@
-import { PlanBadge } from "@/app/(site)/plans/components/PlanBadge"
-import { Button } from "@/components/ui/button"
+import { BaselineNav } from "@/components/BaselineNav"
+import { PlanBadge } from "@/components/PlanBadge"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { getMonthDescription } from "@/data"
 import { BudgetTypeYearly, GetPortfolioWithItems } from "@/models"
-import { ChevronRight } from "lucide-react"
-import Link from "next/link"
 import { BudgetTable } from "./BudgetTable"
 import { BudgetYearlyTable } from "./BudgetYearlyTable"
 import { WorkloadTable } from "./WorkloadTable"
@@ -26,51 +24,7 @@ export function PortfolioViewForm({ portfolio }: Props) {
         <>
             <div className="flex items-center justify-between">
                 <h2 className="text-2xl font-bold">Portfolio View</h2>
-                <div className="flex">
-                    <Button variant="ghost" asChild>
-                        <Link
-                            href={`/baselines/form?baselineId=${portfolio.baseline_id}`}
-                            className="flex w-full"
-                            prefetch={false}
-                        >
-                            <span>Baseline</span>{" "}
-                            <ChevronRight className="h-4 w-4" />
-                        </Link>
-                    </Button>
-
-                    <Button variant="ghost" asChild>
-                        <Link
-                            href={`/baselines/${portfolio.baseline_id}/costs`}
-                            className="flex w-full"
-                            prefetch={false}
-                        >
-                            <span>Costs</span>{" "}
-                            <ChevronRight className="h-4 w-4" />
-                        </Link>
-                    </Button>
-
-                    <Button variant="ghost" asChild>
-                        <Link
-                            href={`/baselines/${portfolio.baseline_id}/efforts`}
-                            className="flex w-full"
-                            prefetch={false}
-                        >
-                            <span>Efforts</span>{" "}
-                            <ChevronRight className="h-4 w-4" />
-                        </Link>
-                    </Button>
-
-                    <Button variant="ghost" asChild>
-                        <Link
-                            href={`/portfolios/baselines/${portfolio.baseline_id}`}
-                            className="flex w-full"
-                            prefetch={false}
-                        >
-                            <span>Portfolios</span>{" "}
-                            <ChevronRight className="h-4 w-4" />
-                        </Link>
-                    </Button>
-                </div>
+                <BaselineNav baselineId={portfolio.baseline_id} />
             </div>
             <div className="mb-6 space-y-2">
                 <div className="flex items-center justify-between">

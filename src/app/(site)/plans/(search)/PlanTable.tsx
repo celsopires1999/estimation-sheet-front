@@ -2,6 +2,7 @@
 import { deletePlanAction } from "@/actions/deletePlanAction"
 import { AlertConfirmation } from "@/components/AlertConfirmation"
 import Deleting from "@/components/Deleting"
+import { PlanBadge } from "@/components/PlanBadge"
 import { Filter } from "@/components/react-table/Filter"
 import { NoFilter } from "@/components/react-table/NoFilter"
 import { Button } from "@/components/ui/button"
@@ -51,7 +52,6 @@ import { useAction } from "next-safe-action/hooks"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { JSX, useEffect, useState } from "react"
-import { PlanBadge } from "../components/PlanBadge"
 
 type Props = {
     data: Plan[]

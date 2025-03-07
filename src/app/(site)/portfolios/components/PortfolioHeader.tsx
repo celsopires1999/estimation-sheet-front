@@ -1,9 +1,7 @@
-import { Button } from "@/components/ui/button"
+import { BaselineNav } from "@/components/BaselineNav"
+import { PlanBadge } from "@/components/PlanBadge"
 import { getMonthDescription } from "@/data"
 import { GetBaseline } from "@/models"
-import { ChevronRight } from "lucide-react"
-import Link from "next/link"
-import { PlanBadge } from "../../plans/components/PlanBadge"
 
 type Props = {
     title: string
@@ -30,40 +28,10 @@ export function PortfolioHeader({
                     <h2 className="text-2xl font-bold">{title}</h2>
                     <PlanBadge value={planType} />
                 </div>
-                <div className="flex">
-                    <Button variant="ghost" asChild>
-                        <Link
-                            href={`/baselines/form?baselineId=${baseline?.baseline_id}`}
-                            className="flex w-full"
-                            prefetch={false}
-                        >
-                            <span>Baseline</span>{" "}
-                            <ChevronRight className="h-4 w-4" />
-                        </Link>
-                    </Button>
-
-                    <Button variant="ghost" asChild>
-                        <Link
-                            href={`/baselines/${baseline?.baseline_id}/costs`}
-                            className="flex w-full"
-                            prefetch={false}
-                        >
-                            <span>Costs</span>{" "}
-                            <ChevronRight className="h-4 w-4" />
-                        </Link>
-                    </Button>
-
-                    <Button variant="ghost" asChild>
-                        <Link
-                            href={`/baselines/${baseline?.baseline_id}/efforts`}
-                            className="flex w-full"
-                            prefetch={false}
-                        >
-                            <span>Efforts</span>{" "}
-                            <ChevronRight className="h-4 w-4" />
-                        </Link>
-                    </Button>
-                </div>
+                <BaselineNav
+                    baselineId={baseline?.baseline_id}
+                    omit={title === "New Portfolio" ? undefined : "portfolios"}
+                />
             </div>
             <div className="mb-3 space-y-2">
                 <div className="flex items-center justify-between">

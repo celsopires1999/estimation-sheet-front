@@ -1,10 +1,10 @@
 "use client"
 import { deletePortfolioAction } from "@/actions/deletePortfolioAction"
-import { PlanBadge } from "@/app/(site)/plans/components/PlanBadge"
 import { AlertConfirmation } from "@/components/AlertConfirmation"
 import Deleting from "@/components/Deleting"
 import { FormatDateTime } from "@/components/FormatDateTime"
 import { FormatStartDate } from "@/components/FormatStartDate"
+import { PlanBadge } from "@/components/PlanBadge"
 import { Filter } from "@/components/react-table/Filter"
 import { NoFilter } from "@/components/react-table/NoFilter"
 import { Button } from "@/components/ui/button"
@@ -43,6 +43,7 @@ import {
 import {
     ArrowDown,
     ArrowUp,
+    CircleFadingPlusIcon,
     MoreHorizontal,
     Plus,
     PlusIcon,
@@ -209,7 +210,7 @@ export function PortfoliosTable({ baseline, data }: Props) {
                                 className="flex w-full"
                                 prefetch={false}
                             >
-                                <PlusIcon className="mr-2 h-4 w-4" />
+                                <CircleFadingPlusIcon className="mr-2 h-4 w-4" />
                                 <span>Preliminary</span>
                             </Link>
                         </DropdownMenuItem>
