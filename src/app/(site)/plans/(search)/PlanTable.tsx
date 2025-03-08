@@ -2,6 +2,7 @@
 import { deletePlanAction } from "@/actions/deletePlanAction"
 import { AlertConfirmation } from "@/components/AlertConfirmation"
 import Deleting from "@/components/Deleting"
+import { IconButtonWithTooltip } from "@/components/IconButtonWithTooltip"
 import { PlanBadge } from "@/components/PlanBadge"
 import { Filter } from "@/components/react-table/Filter"
 import { NoFilter } from "@/components/react-table/NoFilter"
@@ -45,7 +46,6 @@ import {
     EditIcon,
     MoreHorizontal,
     PlusIcon,
-    TableOfContents,
     TrashIcon,
 } from "lucide-react"
 import { useAction } from "next-safe-action/hooks"
@@ -149,15 +149,18 @@ export function PlanTable({ data }: Props) {
     }> = {
         plan_type: {
             label: "Type",
+            width: 300,
             filterable: true,
             presenter: PlanBadge,
         },
         code: {
             label: "Code",
+            width: 300,
             filterable: true,
         },
         name: {
             label: "Name",
+            width: 300,
             filterable: true,
         },
     }
@@ -226,7 +229,9 @@ export function PlanTable({ data }: Props) {
     const columns = [
         columnHelper.display({
             id: "actions",
-            header: () => <TableOfContents />,
+            header: () => (
+                <IconButtonWithTooltip text="Add Plan" href="/plans/form" />
+            ),
             cell: ActionsCell,
         }),
         ...columnHeadersArray.map((columnName) => {

@@ -2,6 +2,7 @@
 import { deleteBaselineAction } from "@/actions/deleteBaselineAction"
 import { AlertConfirmation } from "@/components/AlertConfirmation"
 import Deleting from "@/components/Deleting"
+import { IconButtonWithTooltip } from "@/components/IconButtonWithTooltip"
 import { Filter } from "@/components/react-table/Filter"
 import { NoFilter } from "@/components/react-table/NoFilter"
 import { Button } from "@/components/ui/button"
@@ -49,7 +50,6 @@ import {
     ListIcon,
     MoreHorizontal,
     PlusIcon,
-    TableOfContents,
     TrashIcon,
 } from "lucide-react"
 import { useAction } from "next-safe-action/hooks"
@@ -323,7 +323,12 @@ export function BaselineTable({ data }: Props) {
     const columns = [
         columnHelper.display({
             id: "actions",
-            header: () => <TableOfContents />,
+            header: () => (
+                <IconButtonWithTooltip
+                    text="Add Baseline"
+                    href="/baselines/form"
+                />
+            ),
             cell: ActionsCell,
         }),
         ...columnHeadersArray.map((columnName) => {

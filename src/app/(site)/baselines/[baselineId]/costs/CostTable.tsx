@@ -3,6 +3,7 @@ import { deleteCostAction } from "@/actions/deleteCostAction"
 import { AlertConfirmation } from "@/components/AlertConfirmation"
 import Deleting from "@/components/Deleting"
 import { FormatDecimal } from "@/components/FormatDecimal"
+import { IconButtonWithTooltip } from "@/components/IconButtonWithTooltip"
 import { Filter } from "@/components/react-table/Filter"
 import { NoFilter } from "@/components/react-table/NoFilter"
 import { Button } from "@/components/ui/button"
@@ -50,7 +51,6 @@ import {
     MoreHorizontal,
     Plus,
     PlusIcon,
-    TableOfContents,
     TrashIcon,
 } from "lucide-react"
 import { useAction } from "next-safe-action/hooks"
@@ -244,7 +244,12 @@ export function CostTable({ baseline, data }: Props) {
     const columns = [
         columnHelper.display({
             id: "actions",
-            header: () => <TableOfContents />,
+            header: () => (
+                <IconButtonWithTooltip
+                    text="Add Cost"
+                    href={`/baselines/${baseline.baseline_id}/costs/form`}
+                />
+            ),
             cell: ActionsCell,
         }),
         ...columnHeadersArray.map((columnName) => {

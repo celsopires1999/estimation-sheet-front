@@ -2,6 +2,7 @@
 import { deleteCompetenceAction } from "@/actions/deleteCompetenceAction"
 import { AlertConfirmation } from "@/components/AlertConfirmation"
 import Deleting from "@/components/Deleting"
+import { IconButtonWithTooltip } from "@/components/IconButtonWithTooltip"
 import { Filter } from "@/components/react-table/Filter"
 import { NoFilter } from "@/components/react-table/NoFilter"
 import { Button } from "@/components/ui/button"
@@ -43,7 +44,6 @@ import {
     EditIcon,
     MoreHorizontal,
     PlusIcon,
-    TableOfContents,
     TrashIcon,
 } from "lucide-react"
 import { useAction } from "next-safe-action/hooks"
@@ -203,7 +203,12 @@ export function CompetenceTable({ data }: Props) {
     const columns = [
         columnHelper.display({
             id: "actions",
-            header: () => <TableOfContents />,
+            header: () => (
+                <IconButtonWithTooltip
+                    text="Add Competence"
+                    href="/competences/form"
+                />
+            ),
             cell: ActionsCell,
         }),
         ...columnHeadersArray.map((columnName) => {

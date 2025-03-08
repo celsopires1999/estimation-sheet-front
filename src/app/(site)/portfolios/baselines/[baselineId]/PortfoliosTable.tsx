@@ -44,10 +44,10 @@ import {
     ArrowDown,
     ArrowUp,
     CircleFadingPlusIcon,
+    ListPlus,
     MoreHorizontal,
     Plus,
     PlusIcon,
-    TableOfContents,
     TrashIcon,
 } from "lucide-react"
 import { useAction } from "next-safe-action/hooks"
@@ -204,28 +204,6 @@ export function PortfoliosTable({ baseline, data }: Props) {
                 <DropdownMenuContent align="end">
                     <DropdownMenuLabel>Options</DropdownMenuLabel>
                     <DropdownMenuGroup>
-                        <DropdownMenuItem asChild>
-                            <Link
-                                href={`/portfolios/baselines/${row.original.baseline_id}/form?planType=prelimitary`}
-                                className="flex w-full"
-                                prefetch={false}
-                            >
-                                <CircleFadingPlusIcon className="mr-2 h-4 w-4" />
-                                <span>Preliminary</span>
-                            </Link>
-                        </DropdownMenuItem>
-
-                        <DropdownMenuItem asChild>
-                            <Link
-                                href={`/portfolios/baselines/${row.original.baseline_id}/form?planType=definitive`}
-                                className="flex w-full"
-                                prefetch={false}
-                            >
-                                <PlusIcon className="mr-2 h-4 w-4" />
-                                <span>Definitive</span>
-                            </Link>
-                        </DropdownMenuItem>
-
                         <DropdownMenuItem
                             onClick={() => handleDeletePortfolio(row.original)}
                         >
@@ -243,7 +221,7 @@ export function PortfoliosTable({ baseline, data }: Props) {
     const columns = [
         columnHelper.display({
             id: "actions",
-            header: () => <TableOfContents />,
+            header: () => <AddOptions baselineId={baseline.baseline_id} />,
             cell: ActionsCell,
         }),
         ...columnHeadersArray.map((columnName) => {
@@ -530,5 +508,44 @@ export function PortfoliosTable({ baseline, data }: Props) {
             />
             {isDeleting && <Deleting />}
         </div>
+    )
+}
+
+const AddOptions = ({ baselineId }: { baselineId: string }) => {
+    return (
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                    <span className="sr-only">Open Menu</span>
+                    <ListPlus className="h-4 w-4" />
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Add</DropdownMenuLabel>
+                <DropdownMenuGroup>
+                    <DropdownMenuItem asChild>
+                        <Link
+                            href={`/portfolios/baselines/${baselineId}/form?planType=prelimitary`}
+                            className="flex w-full"
+                            prefetch={false}
+                        >
+                            <CircleFadingPlusIcon className="mr-2 h-4 w-4" />
+                            <span>Preliminary</span>
+                        </Link>
+                    </DropdownMenuItem>
+
+                    <DropdownMenuItem asChild>
+                        <Link
+                            href={`/portfolios/baselines/${baselineId}/form?planType=definitive`}
+                            className="flex w-full"
+                            prefetch={false}
+                        >
+                            <PlusIcon className="mr-2 h-4 w-4" />
+                            <span>Definitive</span>
+                        </Link>
+                    </DropdownMenuItem>
+                </DropdownMenuGroup>
+            </DropdownMenuContent>
+        </DropdownMenu>
     )
 }
