@@ -20,7 +20,7 @@ export function EffortHeader({ title, baseline, children }: Props) {
                 <h2 className="text-2xl font-bold">{title}</h2>
                 <BaselineNav
                     baselineId={baseline?.baseline_id}
-                    omit="efforts"
+                    omit={children ? "efforts" : undefined}
                 />
             </div>
             <div className="mb-3 space-y-2">

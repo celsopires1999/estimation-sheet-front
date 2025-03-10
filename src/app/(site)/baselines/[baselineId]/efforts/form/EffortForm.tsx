@@ -130,6 +130,7 @@ export function EffortForm({
 
     const handleAddAllocation = () => {
         const lastIndex = fields.length - 1
+        const allocations = form.getValues().effort_allocations
 
         if (lastIndex < 0) {
             append({
@@ -140,8 +141,8 @@ export function EffortForm({
             return
         }
 
-        const lastYear = +fields[lastIndex].year
-        const lastMonth = +fields[lastIndex].month
+        const lastYear = +allocations[lastIndex].year
+        const lastMonth = +allocations[lastIndex].month
 
         if (lastMonth === 12) {
             append({

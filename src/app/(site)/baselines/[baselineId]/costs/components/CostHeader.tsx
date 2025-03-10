@@ -18,7 +18,10 @@ export function CostHeader({ title, baseline, children }: Props) {
         <>
             <div className="flex items-center justify-between">
                 <h2 className="text-2xl font-bold">{title}</h2>
-                <BaselineNav baselineId={baseline?.baseline_id} omit="costs" />
+                <BaselineNav
+                    baselineId={baseline?.baseline_id}
+                    omit={children ? "costs" : undefined}
+                />
             </div>
             <div className="mb-3 space-y-2">
                 <div className="flex items-center justify-between">

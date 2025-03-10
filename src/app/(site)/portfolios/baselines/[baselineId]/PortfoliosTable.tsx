@@ -44,6 +44,7 @@ import {
     ArrowDown,
     ArrowUp,
     CircleFadingPlusIcon,
+    DownloadIcon,
     ListPlus,
     MoreHorizontal,
     Plus,
@@ -209,6 +210,17 @@ export function PortfoliosTable({ baseline, data }: Props) {
                         >
                             <TrashIcon className="mr-2 h-4 w-4" />
                             <span>Delete</span>
+                        </DropdownMenuItem>
+
+                        <DropdownMenuItem asChild>
+                            <Link
+                                href={`/api/portfolios/${row.original.portfolio_id}/download`}
+                                className="flex w-full"
+                                prefetch={false}
+                            >
+                                <DownloadIcon className="mr-2 h-4 w-4" />
+                                <span>Download</span>
+                            </Link>
                         </DropdownMenuItem>
                     </DropdownMenuGroup>
                 </DropdownMenuContent>
@@ -503,7 +515,7 @@ export function PortfoliosTable({ baseline, data }: Props) {
                 open={showDeleteConfirmation}
                 setOpen={setShowDeleteConfirmation}
                 confirmationAction={confirmDeletePortfolio}
-                title="Are you sure you want to delete this Baseline?"
+                title="Are you sure you want to delete this Portfolio?"
                 message={`This action cannot be undone. This will permanently delete the Porfolio ${portfolioToDelete?.plan_code}  ${portfolioToDelete?.code} / ${portfolioToDelete?.review}.`}
             />
             {isDeleting && <Deleting />}

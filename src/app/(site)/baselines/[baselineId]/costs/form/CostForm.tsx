@@ -144,6 +144,7 @@ export function CostForm({ baseline, cost, years, months }: Props) {
 
     const handleAddAllocation = () => {
         const lastIndex = fields.length - 1
+        const allocations = form.getValues().cost_allocations
 
         if (lastIndex < 0) {
             append({
@@ -154,8 +155,8 @@ export function CostForm({ baseline, cost, years, months }: Props) {
             return
         }
 
-        const lastYear = +fields[lastIndex].year
-        const lastMonth = +fields[lastIndex].month
+        const lastYear = +allocations[lastIndex].year
+        const lastMonth = +allocations[lastIndex].month
 
         if (lastMonth === 12) {
             append({

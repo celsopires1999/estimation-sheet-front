@@ -60,7 +60,9 @@ export function PortfolioViewForm({ portfolio }: Props) {
                             <div className="flex flex-col md:flex-row">
                                 <div className="w-4/6">
                                     <CardHeader>Budget Items</CardHeader>
-                                    <BudgetTable data={portfolio.budgets} />
+                                    <BudgetTable
+                                        data={portfolio.budgets ?? []}
+                                    />
                                 </div>
                                 <div className="w-2/3 md:w-2/6">
                                     <CardHeader>Budget Yearly</CardHeader>
@@ -79,7 +81,9 @@ export function PortfolioViewForm({ portfolio }: Props) {
                             <div className="flex flex-col md:flex-row">
                                 <div className="w-4/6">
                                     <CardHeader>Workload Items</CardHeader>
-                                    <WorkloadTable data={portfolio.workloads} />
+                                    <WorkloadTable
+                                        data={portfolio.workloads ?? []}
+                                    />
                                 </div>
                                 <div className="w-2/3 md:w-2/6">
                                     <CardHeader>Workload Yearly</CardHeader>
