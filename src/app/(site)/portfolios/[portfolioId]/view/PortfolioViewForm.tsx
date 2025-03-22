@@ -133,12 +133,26 @@ function calculateWorkloadYearly(
     return result
 }
 
-function calculateTotalBudget(budgets: GetPortfolioWithItems["budgets"]) {
+function calculateTotalBudget(budgets: GetPortfolioWithItems["budgets"]): {
+    opex: number
+    capex: number
+    run: number
+} {
     if (!budgets) {
-        return 0
+        return { opex: 0, capex: 0, run: 0 }
     }
 
-    return budgets.reduce((total, budget) => total + budget.amount, 0)
+    const opex = budgets
+        .filter((budget) => budget.cost_type === "one_time")
+        .reduce((total, budget) => total + budget.amount, 0)
+    const capex = budgets
+        .filter((budget) => budget.cost_type === "investment")
+        .reduce((total, budget) => total + budget.amount, 0)
+    const run = budgets
+        .filter((budget) => budget.cost_type === "running")
+        .reduce((total, budget) => total + budget.amount, 0)
+
+    return { opex, capex, run }
 }
 
 function calculateBudgetYearly(

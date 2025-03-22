@@ -20,7 +20,11 @@ import { JSX } from "react"
 
 type Props = {
     data: BudgetTypeYearly[]
-    total: number
+    total: {
+        opex: number
+        capex: number
+        run: number
+    }
 }
 
 export function BudgetYearlyTable({ data, total }: Props) {
@@ -172,12 +176,32 @@ export function BudgetYearlyTable({ data, total }: Props) {
                         ))}
                     </TableBody>
                     <TableFooter>
-                        <TableRow>
-                            <TableCell colSpan={2}>Grand Total</TableCell>
-                            <TableCell>
-                                <FormatDecimal value={total} />
-                            </TableCell>
-                        </TableRow>
+                        {total.opex > 0 && (
+                            <TableRow>
+                                <TableCell colSpan={2}>Total OPEX</TableCell>
+                                <TableCell>
+                                    <FormatDecimal value={total.opex} />
+                                </TableCell>
+                            </TableRow>
+                        )}
+
+                        {total.capex > 0 && (
+                            <TableRow>
+                                <TableCell colSpan={2}>Total CAPEX</TableCell>
+                                <TableCell>
+                                    <FormatDecimal value={total.capex} />
+                                </TableCell>
+                            </TableRow>
+                        )}
+
+                        {total.run > 0 && (
+                            <TableRow>
+                                <TableCell colSpan={2}>Total RUN</TableCell>
+                                <TableCell>
+                                    <FormatDecimal value={total.run} />
+                                </TableCell>
+                            </TableRow>
+                        )}
                     </TableFooter>
                 </Table>
             </div>

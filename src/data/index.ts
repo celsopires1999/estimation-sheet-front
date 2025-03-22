@@ -14,7 +14,6 @@ export const MonthOptions = [
 ]
 
 export const YearsOptions = [
-    { id: "2023", description: "2023" },
     { id: "2024", description: "2024" },
     { id: "2025", description: "2025" },
     { id: "2026", description: "2026" },
