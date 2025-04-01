@@ -1,0 +1,11 @@
+services:
+    estimation-sheet-frontend:
+        build:
+            context: .
+            dockerfile: Dockerfile.dev
+        volumes:
+            - .:/home/node/app
+        ports:
+            - 3000:3000
+        extra_hosts:
+            - host.docker.internal:host-gateway
