@@ -1,6 +1,6 @@
 import { BaselineNav } from "@/components/BaselineNav"
 import { PlanBadge } from "@/components/PlanBadge"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { getMonthDescription } from "@/data"
 import { BudgetTypeYearly, GetPortfolioWithItems } from "@/models"
@@ -57,15 +57,15 @@ export function PortfolioViewForm({ portfolio }: Props) {
                 <TabsContent value="budget">
                     <Card>
                         <CardContent>
-                            <div className="flex flex-col md:flex-row">
+                            <div className="mt-4 flex flex-col md:flex-row">
                                 <div className="w-4/6">
-                                    <CardHeader>Budget Items</CardHeader>
+                                    {/* <CardHeader>Budget Items</CardHeader> */}
                                     <BudgetTable
                                         data={portfolio.budgets ?? []}
                                     />
                                 </div>
                                 <div className="w-2/3 md:w-2/6">
-                                    <CardHeader>Budget Yearly</CardHeader>
+                                    {/* <CardHeader>Budget Yearly</CardHeader> */}
                                     <BudgetYearlyTable
                                         data={budgetYearly}
                                         total={totalBudget}
@@ -78,15 +78,15 @@ export function PortfolioViewForm({ portfolio }: Props) {
                 <TabsContent value="workload">
                     <Card>
                         <CardContent>
-                            <div className="flex flex-col md:flex-row">
+                            <div className="mt-4 flex flex-col md:flex-row">
                                 <div className="w-4/6">
-                                    <CardHeader>Workload Items</CardHeader>
+                                    {/* <CardHeader>Workload Items</CardHeader> */}
                                     <WorkloadTable
                                         data={portfolio.workloads ?? []}
                                     />
                                 </div>
-                                <div className="w-2/3 md:w-2/6">
-                                    <CardHeader>Workload Yearly</CardHeader>
+                                <div className="mt-4 w-2/3 md:w-2/6">
+                                    {/* <CardHeader>Workload Yearly</CardHeader> */}
                                     <WorkloadYearlyTable
                                         data={workloadYearly}
                                     />

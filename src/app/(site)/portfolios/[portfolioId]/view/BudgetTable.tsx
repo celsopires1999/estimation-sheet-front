@@ -1,5 +1,10 @@
 "use client"
 import { FormatDecimal } from "@/components/FormatDecimal"
+import { Filter } from "@/components/react-table/Filter"
+import { NoFilter } from "@/components/react-table/NoFilter"
+import { Button } from "@/components/ui/button"
+import { Label } from "@/components/ui/label"
+import { Switch } from "@/components/ui/switch"
 import {
     Table,
     TableBody,
@@ -8,20 +13,53 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
+import { useTableStateHelper } from "@/hooks/useTableStateHelper"
 import { Budget, getCostTypeDescription } from "@/models"
 import {
     createColumnHelper,
     flexRender,
     getCoreRowModel,
+    getFacetedUniqueValues,
+    getFilteredRowModel,
+    getPaginationRowModel,
+    getSortedRowModel,
     useReactTable,
 } from "@tanstack/react-table"
-import { JSX } from "react"
+import { ArrowDown, ArrowUp } from "lucide-react"
+import { useRouter, useSearchParams } from "next/navigation"
+import { JSX, useEffect } from "react"
 
 type Props = {
     data: Budget[]
 }
 
 export function BudgetTable({ data }: Props) {
+    const router = useRouter()
+
+    const searchParams = useSearchParams()
+
+    const [
+        filterToggle,
+        pageIndex,
+        sorting,
+        setSorting,
+        columnFilters,
+        setColumnFilters,
+        handleFilterToggle,
+        handlePage,
+        handlePagination,
+        handleSorting,
+        handleColumnFilters,
+    ] = useTableStateHelper()
+
+    const handleFilterToggleChange = (checked: boolean) => {
+        if (!checked) {
+            table.resetColumnFilters()
+        }
+
+        handleFilterToggle(checked)
+    }
+
     const columnHeadersArray: Array<keyof Budget> = [
         "description",
         "cost_type",
@@ -32,20 +70,23 @@ export function BudgetTable({ data }: Props) {
         [K in keyof Budget]: {
             label: string
             width?: number
+            filterable?: boolean
             headerRight?: boolean
             transform?: (value: unknown) => string
             presenter?: ({ value }: { value: unknown }) => JSX.Element
         }
     }> = {
-        description: { label: "Description", width: 500 },
+        description: { label: "Description", width: 500, filterable: true },
         cost_type: {
             label: "Type",
             width: 50,
+            filterable: true,
             transform: getCostTypeDescription,
         },
         amount: {
             label: "Amount (BRL)",
             width: 100,
+            filterable: false,
             headerRight: true,
             presenter: FormatDecimal,
         },
@@ -71,24 +112,38 @@ export function BudgetTable({ data }: Props) {
                 size:
                     columnDefs[columnName as keyof typeof columnDefs]?.width ??
                     undefined,
-                header: () => {
-                    const className = columnDefs[
-                        columnName as keyof typeof columnDefs
-                    ]?.headerRight
-                        ? "text-right"
-                        : ""
-
+                enableColumnFilter:
+                    columnDefs[columnName as keyof typeof columnDefs]
+                        ?.filterable ?? false,
+                header: ({ column }) => {
                     return (
-                        // <div className="flex h-9 w-full cursor-default items-center justify-between gap-2 whitespace-nowrap rounded-md px-4 py-2 pl-1 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0">
-                        <div
-                            className={`h-9 cursor-default whitespace-nowrap rounded-md px-4 py-2 pl-1 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 ${className}`}
+                        <Button
+                            variant="ghost"
+                            className="flex w-full justify-between pl-1"
+                            onClick={() =>
+                                column.toggleSorting(
+                                    column.getIsSorted() === "asc",
+                                )
+                            }
                         >
                             {
                                 columnDefs[
                                     columnName as keyof typeof columnDefs
                                 ]?.label
                             }
-                        </div>
+                            {column.getIsSorted() === "asc" && (
+                                <ArrowUp className="ml-2 h-4 w-4" />
+                            )}
+
+                            {column.getIsSorted() === "desc" && (
+                                <ArrowDown className="ml-2 h-4 w-4" />
+                            )}
+
+                            {/* {column.getIsSorted() !== "desc" &&
+                                        column.getIsSorted() !== "asc" && (
+                                            <ArrowUpDown className="ml-2 h-4 w-4" />
+                                        )} */}
+                        </Button>
                     )
                 },
                 cell: (info) => {
@@ -114,11 +169,54 @@ export function BudgetTable({ data }: Props) {
     const table = useReactTable({
         data,
         columns,
+        state: {
+            sorting,
+            columnFilters,
+            pagination: {
+                pageIndex,
+                pageSize: 100,
+            },
+        },
+        onColumnFiltersChange: setColumnFilters,
+        onSortingChange: setSorting,
         getCoreRowModel: getCoreRowModel(),
+        getPaginationRowModel: getPaginationRowModel(),
+        getFilteredRowModel: getFilteredRowModel(),
+        getFacetedUniqueValues: getFacetedUniqueValues(),
+        getSortedRowModel: getSortedRowModel(),
     })
+
+    const handlePageChange = (direction: "previous" | "next") => {
+        table.setPageIndex(handlePage(table.getState().pagination, direction))
+    }
+
+    useEffect(() => {
+        handlePagination(table.getState().pagination, table.getPageCount())
+    }, [table.getState().pagination]) // eslint-disable-line react-hooks/exhaustive-deps
+
+    useEffect(() => {
+        handleSorting(table.getState().sorting)
+    }, [table.getState().sorting]) // eslint-disable-line react-hooks/exhaustive-deps
+
+    useEffect(() => {
+        handleColumnFilters(table.getState().columnFilters)
+    }, [table.getState().columnFilters]) // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
         <div className="flex flex-col gap-1 sm:px-8">
+            <div className="flex items-center justify-between">
+                <h2 className="text-base">Budget Items</h2>
+                <div className="flex items-center space-x-2">
+                    <Switch
+                        id="filterToggle"
+                        checked={filterToggle}
+                        onCheckedChange={handleFilterToggleChange}
+                    />
+                    <Label htmlFor="filterToggle" className="font-semibold">
+                        Filter
+                    </Label>
+                </div>
+            </div>
             {/* <div className="overflow-hidden rounded-lg border border-border"> */}
             <div className="max-h-80 overflow-auto rounded-lg border border-border">
                 <Table className="border">
@@ -148,6 +246,27 @@ export function BudgetTable({ data }: Props) {
                                                       header.getContext(),
                                                   )}
                                         </div>
+                                        {filterToggle ? (
+                                            header.column.getCanFilter() ? (
+                                                <div className="grid w-max place-content-center">
+                                                    <Filter
+                                                        column={header.column}
+                                                        filteredRows={table
+                                                            .getFilteredRowModel()
+                                                            .rows.map((row) =>
+                                                                row.getValue(
+                                                                    header
+                                                                        .column
+                                                                        .id,
+                                                                ),
+                                                            )}
+                                                    />
+                                                </div>
+                                            ) : header.id ===
+                                              "actions" ? null : (
+                                                <NoFilter />
+                                            )
+                                        ) : null}
                                     </TableHead>
                                 ))}
                             </TableRow>
@@ -171,6 +290,64 @@ export function BudgetTable({ data }: Props) {
                         ))}
                     </TableBody>
                 </Table>
+            </div>
+            <div className="flex flex-wrap items-center justify-between gap-1">
+                <div>
+                    <p className="whitespace-nowrap font-bold">
+                        {`Page ${table.getState().pagination.pageIndex + 1} of ${Math.max(1, table.getPageCount())}`}
+                        &nbsp;&nbsp;
+                        {`[${table.getFilteredRowModel().rows.length} ${table.getFilteredRowModel().rows.length !== 1 ? "total results" : "result"}]`}
+                    </p>
+                </div>
+                <div className="flex flex-row gap-1">
+                    <div className="flex flex-row gap-1">
+                        <Button
+                            variant="outline"
+                            onClick={() => router.refresh()}
+                        >
+                            Refresh Data
+                        </Button>
+                        <Button
+                            variant="outline"
+                            onClick={() => table.resetSorting()}
+                        >
+                            Reset Sorting
+                        </Button>
+                        {filterToggle && (
+                            <Button
+                                variant="outline"
+                                onClick={() => {
+                                    table.resetColumnFilters()
+                                    const params = new URLSearchParams(
+                                        searchParams.toString(),
+                                    )
+                                    params.delete("filter")
+                                    router.replace(`?${params.toString()}`, {
+                                        scroll: false,
+                                    })
+                                }}
+                            >
+                                Reset Filters
+                            </Button>
+                        )}
+                    </div>
+                    <div className="flex flex-row gap-1">
+                        <Button
+                            variant="outline"
+                            onClick={() => handlePageChange("previous")}
+                            disabled={!table.getCanPreviousPage()}
+                        >
+                            Previous
+                        </Button>
+                        <Button
+                            variant="outline"
+                            onClick={() => handlePageChange("next")}
+                            disabled={!table.getCanNextPage()}
+                        >
+                            Next
+                        </Button>
+                    </div>
+                </div>
             </div>
         </div>
     )

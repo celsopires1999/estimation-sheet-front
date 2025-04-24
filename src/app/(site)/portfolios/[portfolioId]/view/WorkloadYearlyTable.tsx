@@ -121,6 +121,9 @@ export function WorkloadYearlyTable({ data }: Props) {
 
     return (
         <div className="flex flex-col gap-1 sm:px-8">
+            <div className="flex items-center justify-between">
+                <h2 className="text-base">Workload Yearly</h2>
+            </div>
             {/* <div className="overflow-hidden rounded-lg border border-border"> */}
             <div className="max-h-64 overflow-auto rounded-lg border border-border">
                 <Table className="border">
