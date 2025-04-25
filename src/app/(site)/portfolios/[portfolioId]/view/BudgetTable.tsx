@@ -9,6 +9,7 @@ import {
     Table,
     TableBody,
     TableCell,
+    TableFooter,
     TableHead,
     TableHeader,
     TableRow,
@@ -202,6 +203,13 @@ export function BudgetTable({ data }: Props) {
         handleColumnFilters(table.getState().columnFilters)
     }, [table.getState().columnFilters]) // eslint-disable-line react-hooks/exhaustive-deps
 
+    const calculateFilteredTotal = () => {
+        return table.getFilteredRowModel().rows.reduce((total, row) => {
+            const amount = row.getValue("amount") as number
+            return total + (amount || 0)
+        }, 0)
+    }
+
     return (
         <div className="flex flex-col gap-1 sm:px-8">
             <div className="flex items-center justify-between">
@@ -289,6 +297,18 @@ export function BudgetTable({ data }: Props) {
                             </TableRow>
                         ))}
                     </TableBody>
+                    <TableFooter>
+                        <TableRow>
+                            <TableCell colSpan={2}>Total</TableCell>
+                            <TableCell className="text-right">
+                                {new Intl.NumberFormat("pt-BR", {
+                                    style: "decimal",
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2,
+                                }).format(+calculateFilteredTotal())}
+                            </TableCell>
+                        </TableRow>
+                    </TableFooter>
                 </Table>
             </div>
             <div className="flex flex-wrap items-center justify-between gap-1">
