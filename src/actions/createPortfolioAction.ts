@@ -77,11 +77,11 @@ async function createPortfolio(input: CreatePortfolioType) {
                         throw new ValidationError(
                             "The Plan does not support the Baseline duration with the selected Start Year and Start Month",
                         )
-                    case /portfolio for plan id.*baseline code.*already exists/.test(
+                    case /portfolio for baseline id.*and plan id.*with start date.*already exists/.test(
                         e.message,
                     ):
                         throw new ValidationError(
-                            "There is a Portfolio for the Baseline and Plan combination already",
+                            "There is a Portfolio with Baseline, Plan, Start Year and Start Month combination already",
                         )
                     default:
                         break
