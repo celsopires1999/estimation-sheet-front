@@ -1,6 +1,5 @@
 import { BaselineNav } from "@/components/BaselineNav"
 import { PlanBadge } from "@/components/PlanBadge"
-import { getMonthDescription } from "@/data"
 import { GetBaseline } from "@/models"
 
 type Props = {
@@ -16,11 +15,6 @@ export function PortfolioHeader({
     planType,
     children,
 }: Props) {
-    const month = baseline
-        ? getMonthDescription(baseline?.start_date.substring(5, 7))
-        : null
-    const year = baseline ? baseline.start_date.substring(0, 4) : null
-
     return (
         <>
             <div className="flex items-center justify-between">
