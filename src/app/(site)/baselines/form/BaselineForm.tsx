@@ -150,7 +150,7 @@ export function BaselineForm({
                         <div className="flex items-start justify-between gap-4">
                             <div className="w-1/2">
                                 <ComboboxWithLabel<SaveBaselineType>
-                                    fieldTitle="Start Year"
+                                    fieldTitle="Base Year"
                                     nameInSchema="start_year"
                                     data={years ?? []}
                                     className="max-w-full"
@@ -158,7 +158,7 @@ export function BaselineForm({
                             </div>
                             <div className="w-1/2">
                                 <ComboboxWithLabel<SaveBaselineType>
-                                    fieldTitle="Start Month"
+                                    fieldTitle="Base Month"
                                     nameInSchema="start_month"
                                     data={months ?? []}
                                     className="max-w-full"

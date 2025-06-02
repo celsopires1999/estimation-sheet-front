@@ -40,9 +40,7 @@ export function PortfolioHeader({
                         <span className="truncate">{`${baseline?.title}`}</span>
                     </h3>
                     <div className="flex items-center gap-4">
-                        <h3>
-                            {`Starting on ${year} ${month}: ${baseline?.duration} months (duration)`}
-                        </h3>
+                        <h3>{`Duration: ${baseline?.duration} months`}</h3>
                         {children}
                     </div>
                 </div>

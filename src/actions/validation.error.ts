@@ -14,9 +14,24 @@ export async function errorHandling(response: Response) {
             throw new ValidationError(message)
         }
 
-        throw new ValidationError(e.message)
+        throw new ValidationError(friendlyErrorMessage(e.message))
     }
 
     console.error(e)
     throw new Error(e.error)
+}
+
+function friendlyErrorMessage(error: string): string {
+    switch (true) {
+        case /neither start date nor duration can be changed because baseline.*has costs/.test(
+            error,
+        ):
+            return "Neither Base Year/Month nor Duration can be changed because the Baseline has already costs"
+        case /neither start date nor duration can be changed because baseline.*has efforts/.test(
+            error,
+        ):
+            return "Neither Base Year/Month nor Duration can be changed because the Baseline has already efforts"
+        default:
+            return error
+    }
 }
